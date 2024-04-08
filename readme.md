@@ -67,10 +67,7 @@ The `ntools` crates are included as dependencies through feature flags. Specify
 
 ```toml
 [dependencies]
-ntools = {
-    git      = "https://github.com/repositony/ntools.git",
-    features = ["full"]
-}
+ntools = { git = "https://github.com/repositony/ntools.git", features = ["full"] }
 ```
 
 However, it is strongly recommended that users are selective to avoid compiling
@@ -81,10 +78,7 @@ emissions from a FISPACT-II JSON.
 
 ```toml
 [dependencies]
-ntools = {
-    git      = "https://github.com/repositony/ntools.git",
-    features = ["fispact", "iaea"]
-}
+ntools = { git = "https://github.com/repositony/ntools.git", features = ["fispact", "iaea"] }
 ```
 
 This will compile only the `fispact` and `iaea` crates. The first has various
