@@ -1,0 +1,37 @@
+[package]
+authors.workspace      = true
+description            = "Module for interacting with IAEA decay data"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["decay-data", "iaea", "neutronics", "ntools"]
+license.workspace      = true
+name                   = "ntools-iaea"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+bincode       = { workspace = true }
+csv           = { workspace = true }
+kdam          = { features = ["rayon", "template"], workspace = true }
+log           = { workspace = true }
+nom           = { workspace = true }
+ntools-format = { workspace = true }
+rayon         = { workspace = true }
+serde         = { features = ["derive"], workspace = true }
+serde_json    = { workspace = true }
+stderrlog     = { workspace = true }
+textwrap      = { workspace = true }
+thiserror     = { workspace = true }
+
+reqwest = { default_features = false, features = [
+    "blocking",
+    "rustls-tls",
+], workspace = true }
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

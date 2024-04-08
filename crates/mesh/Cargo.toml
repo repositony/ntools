@@ -1,0 +1,32 @@
+[package]
+authors.workspace      = true
+description            = "Module for mesh tally operations and file parsing"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["mcnp", "mesh", "meshtal", "neutronics", "ntools"]
+license.workspace      = true
+name                   = "ntools-mesh"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+clap          = { features = ["derive", "wrap_help"], workspace = true }
+kdam          = { features = ["template"], workspace = true }
+log           = { workspace = true }
+nom           = { workspace = true }
+ntools-format = { workspace = true }
+serde         = { workspace = true }
+serde_json    = { workspace = true }
+thiserror     = { workspace = true }
+vtkio         = { workspace = true }
+
+[dev-dependencies]
+rstest = "0.18"
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

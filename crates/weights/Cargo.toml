@@ -1,0 +1,24 @@
+[package]
+authors.workspace      = true
+description            = "Module for weight window operations"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["neutronics", "ntools", "variance-reduction", "weight-window"]
+license.workspace      = true
+name                   = "ntools-weights"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+log           = { workspace = true }
+ntools-format = { workspace = true }
+thiserror     = { workspace = true }
+vtkio         = { workspace = true }
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

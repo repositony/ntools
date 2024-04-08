@@ -1,0 +1,26 @@
+[package]
+authors.workspace      = true
+description            = "Generate weight windows for MCNP"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["neutronics", "ntools", "variance-reduction", "weight-window"]
+license.workspace      = true
+name                   = "ntools-wwgen"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+itertools      = { workspace = true }
+log            = { workspace = true }
+ntools-format  = { workspace = true }
+ntools-mesh    = { workspace = true }
+ntools-weights = { workspace = true }
+thiserror      = { workspace = true }
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

@@ -1,0 +1,86 @@
+[workspace.package]
+authors      = ["Tony <repositony@outlook.com>"]
+edition      = "2021"
+homepage     = "https://repositony.github.io/ntools/"
+license      = "GPL-3.0 license"
+repository   = "https://github.com/repositony/ntools"
+rust-version = "1.77"
+version      = "0.1.0"
+
+[package]
+authors.workspace      = true
+description            = "A modular toolkit of fast and reliable libraries for neutronics analysis"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["iaea", "mcnp", "neutronics", "vtk", "weight-window"]
+license.workspace      = true
+name                   = "ntools"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[workspace]
+members = [
+    "crates/fispact",
+    "crates/format",
+    "crates/iaea",
+    "crates/mesh",
+    "crates/posvol",
+    "crates/weights",
+    "crates/wwgen",
+]
+
+[dependencies]
+ntools-fispact = { optional = true, workspace = true }
+ntools-format  = { workspace = true }
+ntools-iaea    = { optional = true, workspace = true }
+ntools-mesh    = { optional = true, workspace = true }
+ntools-posvol  = { optional = true, workspace = true }
+ntools-weights = { optional = true, workspace = true }
+ntools-wwgen   = { optional = true, workspace = true }
+
+[features]
+fispact = ["ntools-fispact"]
+iaea    = ["ntools-iaea"]
+mesh    = ["ntools-mesh"]
+posvol  = ["ntools-posvol"]
+weights = ["ntools-weights"]
+wwgen   = ["ntools-wwgen"]
+
+full = ["fispact", "iaea", "mesh", "posvol", "weights", "wwgen"]
+
+[lib]
+doctest = false
+
+[workspace.lints.rust]
+dead_code      = "warn"
+unsafe_code    = "forbid"
+unused_imports = "warn"
+
+[workspace.dependencies]
+# ntools crates
+ntools-fispact = { version = "*", path = "crates/fispact" }
+ntools-format  = { version = "*", path = "crates/format" }
+ntools-iaea    = { version = "*", path = "crates/iaea" }
+ntools-mesh    = { version = "*", path = "crates/mesh" }
+ntools-posvol  = { version = "*", path = "crates/posvol" }
+ntools-weights = { version = "*", path = "crates/weights" }
+ntools-wwgen   = { version = "*", path = "crates/wwgen" }
+
+# external crates
+bincode    = "1.3"
+clap       = "4.2"
+csv        = "1.2"
+itertools  = "0.12"
+kdam       = "0.5"
+log        = "0.4"
+nom        = "7.1"
+rayon      = "1.8"
+reqwest    = { version = "0.12", default-features = false }
+serde      = "1.0"
+serde_json = "1.0"
+stderrlog  = "0.6"
+textwrap   = "0.16"
+thiserror  = "1.0"
+vtkio      = { git = "https://github.com/elrnv/vtkio.git", rev = "0c14e90" }

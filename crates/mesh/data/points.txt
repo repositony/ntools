@@ -1,0 +1,36 @@
+# this is a comment in points.txt
+
+The `#` should be used explicitly for comments, but any line un-parsable to a 
+Point or known keyword is ignored (like this line).
+
+# Notes:
+#  - All values can be ineteger, decimal, and scientific formats
+#  - Keywords such as 'xyz' and 'total' are case-insensitive 
+#  - If no geometry keyword is defined, the points are interpreted as the 
+#    coordinate system appropriate to the mesh being searched. 
+#       i.e. Geometry::Rectangular assumes (x,y,z) 
+#            Geometry::Cylindrical assumes (r,z,t) 
+
+1.0 5.0 7.0                 # 'Total' energy, 'Total' time, (i, j, k)
+total 1.0 5.0 7.0           # 'Total' energy, 'Total' time, (i, j, k)
+total total 1.0 5.0 7.0     # 'Total' energy, 'Total' time, (i, j, k)
+4.0 1.0 5.0 7.0             #  4 MeV  energy, 'Total' time, (i, j, k)
+4.0 1e16 1.0 5.0 7.0        #  4 MeV  energy,  1e16   time, (i, j, k)
+
+# Otherwise points below a geometry keyword are interpreted as specified and
+# converted as appropriate in the background for the search.
+
+xyz                         # points below explicitly interpreted as cartesian  
+1.0 5.0 7.0                 # 'Total' energy, 'Total' time, (x, y, z)
+total 1.0 5.0 7.0           # 'Total' energy, 'Total' time, (x, y, z)
+total total 1.0 5.0 7.0     # 'Total' energy, 'Total' time, (x, y, z)
+4.0 1.0 5.0 7.0             #  4 MeV  energy, 'Total' time, (x, y, z)
+4.0 1e16 1.0 5.0 7.0        #  4 MeV  energy,  1e16   time, (x, y, z)
+
+rzt                         # points below explicitly interpreted as cartesian  
+1.0 5.0 7.0                 # 'Total' energy, 'Total' time, (r, z, t)
+total 1.0 5.0 7.0           # 'Total' energy, 'Total' time, (r, z, t)
+total total 1.0 5.0 7.0     # 'Total' energy, 'Total' time, (r, z, t)
+4.0 1.0 5.0 7.0             #  4 MeV  energy, 'Total' time, (r, z, t)
+4.0 1e16 1.0 5.0 7.0        #  4 MeV  energy,  1e16   time, (r, z, t)
+

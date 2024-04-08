@@ -1,0 +1,24 @@
+[package]
+authors.workspace      = true
+description            = "Analysis tools for FISPACT-II inventory calculations"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["activation", "fispact", "neutronics", "ntools"]
+license.workspace      = true
+name                   = "ntools-fispact"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+ntools-format = { workspace = true }
+serde         = { features = ["derive"], workspace = true }
+serde_json    = { workspace = true }
+thiserror     = { workspace = true }
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

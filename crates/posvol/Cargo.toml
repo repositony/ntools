@@ -1,0 +1,23 @@
+[package]
+authors.workspace      = true
+description            = "Module for dealing with UKAEA CuV posvol binaries"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["cell-under-voxel", "neutronics", "ntools", "posvol"]
+license.workspace      = true
+name                   = "ntools-posvol"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+bincode       = { workspace = true }
+ntools-format = { workspace = true }
+serde         = { features = ["derive"], workspace = true }
+serde_json    = { workspace = true }
+textwrap      = { workspace = true }
+thiserror     = { workspace = true }
+
+[lints]
+workspace = true
