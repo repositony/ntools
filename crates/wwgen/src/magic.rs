@@ -11,7 +11,7 @@ use log::warn;
 ///
 /// - `powers` - Softening factor used as ww=>ww^power
 /// - `max_errors` - Errors above this are set to 0/analogue
-/// - `total_only` - Only generate weights from [Group::Total](crate::mesh::Group)
+/// - `total_only` - Only generate weights from [Group::Total](ntools_mesh::Group)
 ///
 /// Weights are calculated as `(0.5 * (v.result / flux_ref)).powf(power)`. For
 /// example, applying a 0.7 de-tuning factor and setting voxels with errors
@@ -28,7 +28,7 @@ use log::warn;
 ///
 /// By default, this generates weight windows for all time and energy groups.
 /// To generate a simpler set of weight windows based only on the
-/// [Group::Total](crate::mesh::Group), set the `total_only` boolean to `true`.
+/// [Group::Total](ntools_mesh::Group), set the `total_only` boolean to `true`.
 pub fn mesh_to_ww(mesh: &Mesh, power: f64, max_error: f64, total_only: bool) -> WeightWindow {
     let mut ww: WeightWindow = initialise_ww_from_mesh(mesh, total_only);
     ww.weights = compute_weights(mesh, &[power], &[max_error], total_only);
