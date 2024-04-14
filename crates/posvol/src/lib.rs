@@ -1,4 +1,5 @@
 //! Module for working with UKAEA CuV posvol binaries
+//!
 //! The 'posvol' binary generated from Cell-under-Voxel MCR2S runs lists the
 //! dominant cell found inside each voxel (by volume).
 //!
