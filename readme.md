@@ -92,7 +92,7 @@ To produce the full library documentation seen
 feature flag.
 
 ```shell
-cargo doc --no-deps --features full
+cargo doc --workspace --no-deps --features full 
 ```
 
 To run all tests for all modules, use the `--workspace` flag.
