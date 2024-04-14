@@ -22,7 +22,7 @@ library.
 
 | Command line   | Description                                             |
 | -------------- | ------------------------------------------------------- |
-| `mesh2vtk`     | Convert any meshtal tally to various VTK formats        |
+| [mesh2vtk](https://github.com/repositony/mesh2vtk) | Convert any meshtal tally to various VTK formats        |
 | `mesh2ww`      | Convert any meshtal tally to a mesh-based weight window |
 | `pointextract` | Extract voxel results for any point(s) in a mesh        |
 | [splitmesh](https://github.com/repositony/splitmesh) | Split meshtal tallies into individual files             |
