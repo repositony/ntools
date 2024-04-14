@@ -35,7 +35,7 @@ jobs:
         run: cargo clean --doc
 
       - name: Build documentation
-        run: cargo doc --no-deps --features full
+        run: cargo doc --workspace --no-deps --features full
 
       - name: Add redirect
         run: echo '<meta http-equiv="refresh" content="0;url=ntools/index.html">' > target/doc/index.html
