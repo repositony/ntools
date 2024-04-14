@@ -35,7 +35,7 @@ pub fn write_single_particle(weight_window: &WeightWindow, output: &str) {
 /// A [WeightWindow] instance corresponds to a full set of weight windows for a
 /// single particle type. This can be written simply using the
 /// [write_single_particle()] function or calling
-/// [write()](crate::weights::WeightWindow::write) directly.
+/// [write()](WeightWindow::write) directly.
 ///
 /// This function attempts to combine a list of weight windows into a single
 /// wwout file for multiple particles.
