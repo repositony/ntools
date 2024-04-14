@@ -9,7 +9,7 @@ use std::fs::File;
 use std::path::Path;
 use std::sync::OnceLock;
 
-/// Decode the binary file back into [Record]s
+/// Decode the binary file back into [Record](crate::Record)s
 ///
 /// The [prefetch_binary()](crate::prefetch_binary) will produce a binary file
 /// of all decay data for a particular radiation type.
