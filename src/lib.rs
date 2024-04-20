@@ -1,14 +1,15 @@
-//! `ntools` is a semi-modular toolkit of fast and reliable libraries for
-//! neutronics analysis
+//! A semi-modular toolkit of fast and reliable libraries for neutronics
+//! analysis
 //!
 #![doc = include_str!("../readme.md")]
 #![deny(missing_docs, missing_debug_implementations)]
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 
-// Re-exports of toolkit crates.
+// Re-exports of default crates
 #[doc(inline)]
 pub use ntools_format as format;
 
+// Re-exports of crates that are behind feature flags
 #[cfg(feature = "fispact")]
 #[cfg_attr(docsrs, doc(cfg(feature = "fispact")))]
 #[doc(inline)]

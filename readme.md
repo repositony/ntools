@@ -18,7 +18,9 @@ The full library documentation published [here](https://repositony.github.io/nto
 ## Command line tools
 
 Several simple and efficient command line tools are written using this core
-library. Unlinked tools will be made public when I have time to clean them up.
+library.
+
+Un-linked tools will be made public when I have time to clean them up.
 
 | Command line   | Description                                             |
 | -------------- | ------------------------------------------------------- |
@@ -96,7 +98,7 @@ To produce the full library documentation seen
 feature flag.
 
 ```shell
-cargo doc --workspace --no-deps --features full 
+cargo doc --workspace --no-deps --features full
 ```
 
 To run all tests for all modules, use the `--workspace` flag.
