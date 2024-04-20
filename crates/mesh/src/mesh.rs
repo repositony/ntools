@@ -548,7 +548,7 @@ impl Mesh {
     }
 }
 
-/// Indexing helpers
+// Indexing helpers
 impl Mesh {
     /// Find the global voxel index from (e,t,i,j,k) indicies
     ///
@@ -659,9 +659,9 @@ impl Mesh {
     }
 }
 
-/// Mesh associated functions
-///
-/// i.e. called as Mesh::function()
+// Mesh associated functions
+//
+// i.e. called as Mesh::function()
 impl Mesh {
     /// Initialise new mesh with known id
     ///
@@ -838,7 +838,7 @@ impl Mesh {
     }
 }
 
-/// Voxel indexing, filters, and useful searches
+// Voxel indexing, filters, and useful searches
 impl Mesh {
     /// Find index bin containing 'value', where bins are low < value <= high
     ///
@@ -1173,8 +1173,8 @@ impl fmt::Display for Mesh {
 
 /// Mesh geometry types, i.e. `Rectangular`, `Cylindrical`
 ///
-/// Spherical is not currently implemented because everyone I've asked questions
-/// it's existance in MCNP. This can be implemented if someone needs it.
+/// Spherical is not currently implemented because everyone asked just questions
+/// their existance in MCNP. This can be implemented if someone needs it.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Geometry {
     /// Cartesian (rec, xyz) mesh type
