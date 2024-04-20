@@ -14,7 +14,7 @@ use crate::parsers::nuclide_from_str;
 ///
 /// The IAEA chart of nuclides contains data for the following types:
 ///
-/// - Alpha (`a`) Type of decay radiation
+/// - Alpha (`a`)
 /// - Beta+ or electron capture (`bp`)
 /// - Beta- (`bm`)
 /// - Gamma decay (`g`)
