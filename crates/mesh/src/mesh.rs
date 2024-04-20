@@ -11,9 +11,6 @@ use ntools_format::{f, NumFormat};
 // standard library
 use core::fmt;
 
-// external crates
-use clap::ValueEnum;
-
 /// Common data structure representing a mesh tally
 ///
 /// [Mesh] attributes correspond closely to MCNP input cards for consistency
@@ -1178,7 +1175,7 @@ impl fmt::Display for Mesh {
 ///
 /// Spherical is not currently implemented because everyone I've asked questions
 /// it's existance in MCNP. This can be implemented if someone needs it.
-#[derive(Debug, PartialEq, Clone, Copy, ValueEnum)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Geometry {
     /// Cartesian (rec, xyz) mesh type
     Rectangular = 1,
@@ -1222,7 +1219,7 @@ impl fmt::Display for Geometry {
 }
 
 /// Meshtal output formats, e.g. `COL`, `JK`, `CUV`...
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Format {
     /// Column data (MCNP default)
     ///

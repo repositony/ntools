@@ -12,7 +12,6 @@ rust-version.workspace = true
 version.workspace      = true
 
 [dependencies]
-clap          = { features = ["derive", "wrap_help"], workspace = true }
 kdam          = { features = ["template"], workspace = true }
 log           = { workspace = true }
 nom           = { workspace = true }
