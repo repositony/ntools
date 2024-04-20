@@ -18,15 +18,19 @@ The full library documentation published [here](https://repositony.github.io/nto
 ## Command line tools
 
 Several simple and efficient command line tools are written using this core
-library.
+library. Unlinked tools will be made public when I have time to clean them up.
 
 | Command line   | Description                                             |
 | -------------- | ------------------------------------------------------- |
 | [mesh2vtk](https://github.com/repositony/mesh2vtk) | Convert any meshtal tally to various VTK formats        |
-| `mesh2ww`      | Convert any meshtal tally to a mesh-based weight window |
-| `pointextract` | Extract voxel results for any point(s) in a mesh        |
 | [splitmesh](https://github.com/repositony/splitmesh) | Split meshtal tallies into individual files             |
 | [posvol](https://github.com/repositony/posvol)       | Inspect and convert binary UKAEA CuV posvol files       |
+| `mesh2ww`   | Convert any meshtal tally to a mesh-based global weight windows |
+| `decaydata` | CLI for all decays data information from the IAEA chart of nuclides |
+| `fisdef`    | Generate source cards of any decay type from FISPACT-II inventories |
+| `fisjson`   | General convenience tools for quickly assessing FISPACT-II inventories |
+| `bude`   | Build-up Density Extrapolation (BUDE) mesh generation |
+| `pointextract` | Extract voxel results for any point(s) in a mesh |
 
 All tools are fully documented with detailed `--help` messages, including
 examples for common use cases.
