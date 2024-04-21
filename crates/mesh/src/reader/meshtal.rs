@@ -452,8 +452,7 @@ impl MeshtalReader {
                 mesh.format = format
                     .get(&mesh.id)
                     .ok_or(Error::UnknownMeshFormat(mesh.id))?
-                    .0
-                    .clone();
+                    .0;
 
                 mesh.geometry = format.get(&mesh.id).unwrap().1; // .1 for Geometry
             }
