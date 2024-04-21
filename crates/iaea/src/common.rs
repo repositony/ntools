@@ -173,7 +173,14 @@ impl Nuclide {
     /// assert_eq!(nuclide.name(), "Eu152m1");
     /// ```
     pub fn name(&self) -> String {
-        f!("{}{}{}", capitalise(&self.symbol), self.isotope, self.state)
+        // special case for elements
+        let isotope = if self.isotope == 0 {
+            "".to_string()
+        } else {
+            self.isotope.to_string()
+        };
+
+        f!("{}{}{}", capitalise(&self.symbol), isotope, self.state)
     }
 }
 
