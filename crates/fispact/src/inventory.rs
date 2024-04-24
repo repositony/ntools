@@ -1,4 +1,4 @@
-use crate::interval::Interval;
+use crate::{Dose, Interval, Nuclide};
 
 use serde::{Deserialize, Serialize};
 
@@ -31,38 +31,76 @@ pub struct Inventory {
 
 impl Inventory {
     /// Collection of total activity (Bq) for each [Interval]
-    pub fn activity_list() {
-        todo!()
+    pub fn activity_list(&self) -> Vec<f64> {
+        self.intervals
+            .iter()
+            .map(|interval| interval.activity)
+            .collect()
     }
 
-    /// Collection of total [Dose] for each [Interval]
-    pub fn dose_list() {
-        todo!()
+    /// Collection of sample specific activity (Bq/g) for each [Interval]
+    pub fn specific_activity_list(&self) -> Vec<f64> {
+        self.intervals
+            .iter()
+            .map(|interval| interval.activity / interval.mass)
+            .collect()
+    }
+
+    /// Collection of total [Dose] rates for each [Interval]
+    pub fn dose_list(&self) -> Vec<Dose> {
+        self.intervals
+            .iter()
+            .map(|interval| interval.dose)
+            .collect()
     }
 
     /// Collection of total sample mass (g) for each [Interval]
-    pub fn mass_list() {
-        todo!()
+    pub fn mass_list(&self) -> Vec<f64> {
+        self.intervals
+            .iter()
+            .map(|interval| interval.mass)
+            .collect()
     }
 
+    // todo make time a type for conversions, etc...
     /// Collection of total time (s) for each [Interval]
-    pub fn total_times() {
-        todo!()
+    pub fn total_times(&self) -> Vec<f64> {
+        self.intervals
+            .iter()
+            .map(|interval| interval.irradiation_time + interval.cooling_time)
+            .collect()
     }
 
     /// List of any matching [Nuclide] objects throughout the [Inventory]
-    pub fn nuclides() {
-        todo!()
+    pub fn nuclides(&self) -> Vec<Nuclide> {
+        self.intervals
+            .iter()
+            .flat_map(|interval| interval.nuclides.clone())
+            .collect()
     }
 
-    /// List of the elements seen in the [Inventory]
-    pub fn elements() {
-        todo!()
+    /// List of names for all unique elements in the [Inventory]
+    pub fn element_names(&self) -> Vec<String> {
+        let mut names: Vec<String> = self
+            .intervals
+            .iter()
+            .flat_map(|interval| interval.element_names())
+            .collect();
+        names.sort();
+        names.dedup();
+        names
     }
 
-    /// Collection of nuclide names
-    pub fn nuclide_names() {
-        todo!()
+    /// List of names for all unique nuclides in the [Inventory]
+    pub fn nuclide_names(&self) -> Vec<String> {
+        let mut names: Vec<String> = self
+            .intervals
+            .iter()
+            .flat_map(|interval| interval.nuclide_names())
+            .collect();
+        names.sort();
+        names.dedup();
+        names
     }
 
     /// List of data for some time dependednt transient
