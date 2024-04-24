@@ -12,7 +12,7 @@ pub enum Stability {
 }
 
 /// Nuclide data
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Nuclide {
     /// Element symbol e.g. 'He', 'Co'
     pub element: String,
