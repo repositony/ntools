@@ -1,4 +1,4 @@
-use crate::nuclide::Nuclide;
+use crate::{Nuclide, SortProperty};
 use ntools_format::f;
 
 use serde::{de::Error, Deserialize, Deserializer, Serialize};
@@ -99,6 +99,33 @@ impl Interval {
         elements.sort();
         elements.dedup();
         elements
+    }
+
+    /// Sort nuclides in ascending order by property
+    pub fn sort_ascending(&mut self, property: SortProperty) {
+        match property {
+            SortProperty::Activity => self
+                .nuclides
+                .sort_by(|a, b| a.activity.partial_cmp(&b.activity).unwrap()),
+            SortProperty::Mass => self
+                .nuclides
+                .sort_by(|a, b| a.mass.partial_cmp(&b.mass).unwrap()),
+            SortProperty::Dose => self
+                .nuclides
+                .sort_by(|a, b| a.dose.partial_cmp(&b.dose).unwrap()),
+            SortProperty::Atoms => self
+                .nuclides
+                .sort_by(|a, b| a.atoms.partial_cmp(&b.atoms).unwrap()),
+            SortProperty::Heat => self
+                .nuclides
+                .sort_by(|a, b| a.heat.partial_cmp(&b.heat).unwrap()),
+        }
+    }
+
+    /// Sort nuclides in decending order by property
+    pub fn sort_descending(&mut self, property: SortProperty) {
+        self.sort_ascending(property);
+        self.nuclides.reverse()
     }
 }
 

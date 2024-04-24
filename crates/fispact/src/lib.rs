@@ -137,3 +137,13 @@ pub fn read_json<P: AsRef<Path>>(path: P) -> Result<Inventory> {
     let reader = BufReader::new(File::open(path)?);
     Ok(serde_json::from_reader(reader)?)
 }
+
+/// Sortable properties for [Nuclide]s and [Interval]s
+#[derive(Debug, Clone, Copy)]
+pub enum SortProperty {
+    Activity,
+    Mass,
+    Dose,
+    Atoms,
+    Heat,
+}
