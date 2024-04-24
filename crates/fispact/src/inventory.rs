@@ -6,11 +6,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RunData {
     /// User defined run title
-    run_name: String,
+    pub run_name: String,
     /// User defined flux comment
-    flux_name: String,
+    pub flux_name: String,
     /// Timestamp for inventory calculation
-    timestamp: String,
+    pub timestamp: String,
 }
 
 /// Top level inventory data
@@ -24,9 +24,9 @@ pub struct RunData {
 pub struct Inventory {
     /// Collection of all run intervals
     #[serde(rename = "inventory_data")]
-    intervals: Vec<Interval>,
+    pub intervals: Vec<Interval>,
     /// Metadata for the run
-    run_data: RunData,
+    pub run_data: RunData,
 }
 
 impl Inventory {
