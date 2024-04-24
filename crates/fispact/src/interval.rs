@@ -60,26 +60,6 @@ pub struct Interval {
 }
 
 impl Interval {
-    /// Apply a flux normalisation factor to the appropriate fields
-    pub fn apply_normalisation(&mut self, norm: f64) {
-        self.flux *= norm;
-        self.dose.rate *= norm;
-        self.ingestion *= norm;
-        self.inhalation *= norm;
-        self.heat *= norm;
-        self.alpha_heat *= norm;
-        self.beta_heat *= norm;
-        self.gamma_heat *= norm;
-        self.activity *= norm;
-        self.alpha_activity *= norm;
-        self.beta_activity *= norm;
-        self.gamma_activity *= norm;
-
-        for n in &mut self.nuclides {
-            n.apply_normalisation(norm);
-        }
-    }
-
     /// List of names for all nuclides in the interval
     pub fn nuclide_names(&self) -> Vec<String> {
         let mut nuclides: Vec<String> =
@@ -99,6 +79,19 @@ impl Interval {
         elements.sort();
         elements.dedup();
         elements
+    }
+
+    /// Collection of only the stable nuclides
+    pub fn stable_nuclides(&self) -> Vec<&Nuclide> {
+        self.nuclides
+            .iter()
+            .filter(|n| n.half_life == 0.0)
+            .collect()
+    }
+
+    /// Collection of only the unstable nuclides
+    pub fn unstable_nuclides(&self) -> Vec<&Nuclide> {
+        self.nuclides.iter().filter(|n| n.half_life > 0.0).collect()
     }
 
     /// Sort nuclides in ascending order by property
@@ -126,6 +119,26 @@ impl Interval {
     pub fn sort_descending(&mut self, property: SortProperty) {
         self.sort_ascending(property);
         self.nuclides.reverse()
+    }
+
+    /// Apply a flux normalisation factor to the appropriate fields
+    pub fn apply_normalisation(&mut self, norm: f64) {
+        self.flux *= norm;
+        self.dose.rate *= norm;
+        self.ingestion *= norm;
+        self.inhalation *= norm;
+        self.heat *= norm;
+        self.alpha_heat *= norm;
+        self.beta_heat *= norm;
+        self.gamma_heat *= norm;
+        self.activity *= norm;
+        self.alpha_activity *= norm;
+        self.beta_activity *= norm;
+        self.gamma_activity *= norm;
+
+        for n in &mut self.nuclides {
+            n.apply_normalisation(norm);
+        }
     }
 }
 
