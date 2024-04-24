@@ -79,13 +79,34 @@ impl Interval {
             n.apply_normalisation(norm);
         }
     }
+
+    /// List of names for all nuclides in the interval
+    pub fn nuclide_names(&self) -> Vec<String> {
+        let mut nuclides: Vec<String> =
+            self.nuclides.iter().map(|nuclide| nuclide.name()).collect();
+        nuclides.sort();
+        nuclides.dedup();
+        nuclides
+    }
+
+    /// List of names for all unique elements in the interval
+    pub fn element_names(&self) -> Vec<String> {
+        let mut elements: Vec<String> = self
+            .nuclides
+            .iter()
+            .map(|nuclide| nuclide.element.clone())
+            .collect();
+        elements.sort();
+        elements.dedup();
+        elements
+    }
 }
 
 /// Total sample dose rate and type
 ///
 /// Note this is not the same as the original to make this more ergonomic and
 /// usable for programming.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Dose {
     /// Dose rate (Sv/hr)
     #[serde(rename = "dose")]
@@ -99,7 +120,7 @@ pub struct Dose {
 ///
 /// Either Contact or dose, where the point source contains the distance. This
 /// must be >0.3m.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum DoseKind {
     /// Semi-infinite slab approximation
     Contact,
