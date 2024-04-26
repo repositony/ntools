@@ -182,6 +182,28 @@ impl Nuclide {
 
         f!("{}{}{}", capitalise(&self.symbol), isotope, self.state)
     }
+
+    /// Name of nuclide excluding state information
+    pub fn base_name(&self) -> String {
+        // special case for elements
+        let isotope = if self.isotope == 0 {
+            "".to_string()
+        } else {
+            self.isotope.to_string()
+        };
+
+        f!("{}{}", capitalise(&self.symbol), isotope)
+    }
+
+    /// Formmating for queries, which must be mass+element
+    pub fn query_name(&self) -> Result<String> {
+        // special case for elements
+        if self.isotope == 0 {
+            return Err(Error::InvalidNuclideQuery);
+        }
+
+        Ok(f!("{}{}", self.isotope, self.symbol.to_lowercase()))
+    }
 }
 
 impl std::str::FromStr for Nuclide {
@@ -189,7 +211,7 @@ impl std::str::FromStr for Nuclide {
 
     fn from_str(s: &str) -> Result<Self> {
         let (_, nuclide) = nuclide_from_str(s)
-            .map_err(|_| Error::ParseError(f!("Could not extract values from {s}")))?;
+            .map_err(|_| Error::ParseError(f!("Could not convert {s} into a Nuclide")))?;
 
         Ok(nuclide)
     }
