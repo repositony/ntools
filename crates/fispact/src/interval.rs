@@ -94,6 +94,13 @@ impl Interval {
         self.nuclides.iter().filter(|n| n.half_life > 0.0).collect()
     }
 
+    /// Basic search for a nuclide in the interval by name
+    pub fn find_nuclide(&self, target: &str) -> Option<&Nuclide> {
+        self.nuclides
+            .iter()
+            .find(|n| n.name().to_lowercase().starts_with(&target.to_lowercase()))
+    }
+
     /// Sort nuclides in ascending order by property
     pub fn sort_ascending(&mut self, property: SortProperty) {
         match property {
@@ -119,6 +126,29 @@ impl Interval {
     pub fn sort_descending(&mut self, property: SortProperty) {
         self.sort_ascending(property);
         self.nuclides.reverse()
+    }
+
+    /// Filter nuclides by some predicate
+    ///
+    /// Returns references to the interval nuclides after filtering by the given
+    /// condition. This can be any function that operates on the nuclide that
+    /// returns a boolean.
+    ///
+    /// ```rust, ignore
+    /// let inventory = read_json("path/to/data.json")?;
+    /// let interval  = inventory.intervals[2];
+    ///
+    /// // Filter out any nuclides with activity below 1e8 Bq
+    /// let nuclides = intervals[2].filter(|n| n.activity > 1e8);
+    /// for nuclide in nuclides {
+    ///     println!("{} {}", nuclide.name(), nuclide.activity)
+    /// }
+    /// ```
+    pub fn filter<P>(&self, predicate: P) -> Vec<&Nuclide>
+    where
+        P: FnMut(&&Nuclide) -> bool,
+    {
+        self.nuclides.iter().filter(predicate).collect()
     }
 
     /// Apply a flux normalisation factor to the appropriate fields
