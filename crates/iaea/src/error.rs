@@ -14,7 +14,7 @@ pub enum Error {
 
     /// Failure during GET request to IAEA API
     #[error("request to IAEA API failed")]
-    FailedRequest(#[from] reqwest::Error),
+    FailedRequest(#[from] minreq::Error),
 
     /// Failure to serialise to a JSON string
     #[error("failed serde JSON operation")]
@@ -35,6 +35,10 @@ pub enum Error {
     /// Generic error type for nom parser results
     #[error("parser failed")]
     ParseError(String),
+
+    /// Invalid nuclide state for IAEA API queries
+    #[error("IAEA API does not allow elements")]
+    InvalidNuclideQuery,
 
     /// Unexpected length of bytes based on file content
     #[error("failed to find \"{nuclide:?}\" for {rad_type:?}")]

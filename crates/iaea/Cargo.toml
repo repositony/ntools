@@ -16,6 +16,7 @@ bincode       = { workspace = true }
 csv           = { workspace = true }
 kdam          = { features = ["rayon", "template"], workspace = true }
 log           = { workspace = true }
+minreq        = { workspace = true }
 nom           = { workspace = true }
 ntools-format = { workspace = true }
 rayon         = { workspace = true }
@@ -24,11 +25,6 @@ serde_json    = { workspace = true }
 stderrlog     = { workspace = true }
 textwrap      = { workspace = true }
 thiserror     = { workspace = true }
-
-reqwest = { default_features = false, features = [
-    "blocking",
-    "rustls-tls",
-], workspace = true }
 
 [lib]
 doctest = true

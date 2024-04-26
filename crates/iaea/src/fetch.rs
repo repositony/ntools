@@ -1,6 +1,7 @@
 // standard library
 use std::format as f;
 use std::iter::zip;
+use std::str::FromStr;
 
 // internal modules
 use crate::common::{BaseNuclide, IsomerState, Nuclide, RadType};
@@ -58,21 +59,25 @@ const IAEA_API: &str = "https://nds.iaea.org/relnsd/v1/data?";
 /// For getting something usable, use [fetch_nuclide_records()] instead to
 /// deserialise the rows into [Record]s.
 pub fn fetch_raw_csv(nuclide: &str, rad_type: RadType) -> Result<String> {
+    let nuclide = Nuclide::from_str(nuclide)?;
+
     let url = &f!(
-        "{IAEA_API}fields=decay_rads&nuclides={nuclide}&rad_types={}",
+        "{IAEA_API}fields=decay_rads&nuclides={}&rad_types={}",
+        nuclide.query_name()?,
         rad_type.query_symbol()
     );
 
-    let mut csv_string = reqwest::blocking::get(url)?.text()?;
+    // send get request to IAEA
+    let mut csv_text = minreq::get(url).send()?.as_str()?.to_string();
 
+    // This is dumb, but duplicate fields are no good and both 'max_energy'
+    // and 'mean_energy' have 'unc_me' for their uncertainties. Only affects
+    // the beta- radiation data.
     if rad_type == RadType::BetaMinus {
-        // This is dumb, but duplicate fields are no good and both max_energy
-        // and mean energy have unc_me for their uncertainties. Only affects
-        // the beta- radiation data.
-        csv_string = csv_string.replacen("unc_me", "unc_mean", 1);
+        csv_text = csv_text.replacen("unc_me", "unc_mean", 1);
     }
 
-    Ok(csv_string)
+    Ok(csv_text)
 }
 
 /// Record objects directly from IAEA API
@@ -152,13 +157,19 @@ pub fn fetch_all_data(rad_type: RadType) -> Vec<RecordSet> {
 /// H1, H2, H3, ... Ts293, Ts294, Og294
 /// ```
 pub fn fetch_available_nuclides() -> Result<Vec<Nuclide>> {
-    // query the API
+    // send get request to IAEA
     let url = f!("{IAEA_API}fields=ground_states&nuclides=all");
-    let csv_text = reqwest::blocking::get(url)?.text()?;
+    let csv = minreq::get(url).send()?;
+
+    // build reader directly
+    let mut reader = csv::ReaderBuilder::new()
+        .quoting(false)
+        .trim(csv::Trim::All)
+        .from_reader(csv.as_bytes());
 
     // Need the first filter because the chart has entries for neutons as N1,
     // N4, and N6. These are easily confused for nitrogen isotopes
-    Ok(csv_reader(&csv_text)
+    Ok(reader
         .deserialize::<BaseNuclide>()
         .filter(|record| record.as_ref().is_ok_and(|r| r.z > 0))
         .filter_map(|record| {
