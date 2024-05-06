@@ -54,15 +54,15 @@ pub type RecordSet = Vec<Record>;
 /// For example, the cobalt-60 decay data for gamma emissions:  
 ///
 /// ```rust, no_run
-/// # use ntools_iaea::{fetch_nuclide_records, RadType};
+/// # use ntools_iaea::{fetch_nuclide, RadType};
 /// // Get all records for the Cobalt-60 nuclide
-/// let co60_records = fetch_nuclide_records("co60", RadType::Gamma).unwrap();
+/// let records = fetch_nuclide("co60", RadType::Gamma).unwrap();
 ///
 /// // Find the 1173 keV emission as an example
-/// let example = co60_records
-///         .iter()
-///         .find(|record| record.energy.unwrap() == 1173.228)
-///         .unwrap();
+/// let example = records
+///     .into_iter()
+///     .find(|record| record.energy.unwrap() == 1173.228)
+///     .unwrap();
 ///
 /// // Print a summary of the record
 /// println!("{example}");
@@ -102,12 +102,12 @@ pub type RecordSet = Vec<Record>;
 /// previous example:
 ///
 /// ```rust, no_run
-/// # use ntools_iaea::{fetch_nuclide_records, RadType};
-/// # let co60_records = fetch_nuclide_records("co60", RadType::Gamma).unwrap();
-/// # let example = co60_records
-/// #        .iter()
-/// #        .find(|record| record.energy.unwrap() == 1173.228)
-/// #        .unwrap();
+/// # use ntools_iaea::{fetch_nuclide, RadType};
+/// # let records = fetch_nuclide("co60", RadType::Gamma).unwrap();
+/// # let example = records
+/// #     .into_iter()
+/// #     .find(|record| record.energy.unwrap() == 1173.228)
+/// #     .unwrap();
 /// // Print a JSON string representation of the record
 /// println!("{}", example.to_json().unwrap());
 /// ```
@@ -317,10 +317,10 @@ impl Record {
 
     /// Serailize to JSON format string
     ///
-    /// ```rust
-    /// # use ntools_iaea::{fetch_nuclide_records, RadType};
+    /// ```rust, no_run
+    /// # use ntools_iaea::{fetch_nuclide, RadType};
     /// // Get all records for the Cobalt-60 nuclide
-    /// let co60_records = fetch_nuclide_records("co60", RadType::Gamma).unwrap();
+    /// let co60_records = fetch_nuclide("co60", RadType::Gamma).unwrap();
     ///
     /// // Find the 1173 keV emission as an example
     /// let example = co60_records

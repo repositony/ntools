@@ -1,10 +1,9 @@
-use csv::{self};
 use ntools_format::{f, OptionFormat};
 use serde::{Deserialize, Serialize};
 
 /// Collection of specialised data fields under one type
 ///
-/// Every `rad_type` request to the IAEA chart of nuclides returns a set of csv
+/// Every `rad_type` request to the IAEA chart of nuclides returns a set of CSV
 /// data with ~25 common columns, along with up to 10 that are unique to the
 /// type of decay radiation.
 ///
