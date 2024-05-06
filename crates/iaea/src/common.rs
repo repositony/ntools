@@ -103,126 +103,6 @@ impl std::str::FromStr for RadType {
     }
 }
 
-/// Definition for a particular nuclide
-///
-/// The `FromStr` trait is implemented and will try to parse a string into
-/// a nuclide. Expects `<element><separator><isotope><metastable>` at most but
-/// only the first is required. e.g.
-///
-/// - Element only Co, C
-/// - Isotope Co60, C12
-/// - Metastable Co60m1 Co60m2 Co60m3 ...
-/// - Fispact Co60m Co60n Co60mo
-///
-/// Note that the metastable state should be the ENSDF notation (m1, m2, m3,
-/// etc...). However, this can be converted from anything ending with the
-/// FISPACT-II notation of m, n, etc...but it can not be guaranteed that
-/// this is a 1:1 mapping.
-///
-/// This order must be enforced because something like "104mn" is ambiguous.
-/// i.e. should it be interpreted as Mn-104 or N-104m?
-///
-/// ```rust
-/// # use ntools_iaea::{Nuclide, IsomerState};
-/// # use std::str::FromStr;
-/// // Get the variant from an IAEA symbol
-/// assert_eq!(
-///     Nuclide::from_str("eu-152m2").unwrap(),
-///     Nuclide {
-///         symbol: "eu".to_string(),
-///         isotope: 152,
-///         state: IsomerState::Excited(2)
-///     }
-/// );
-/// ```
-///
-#[derive(Deserialize, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Nuclide {
-    /// Element
-    pub symbol: String,
-    /// Isotope number (Z+N, total nucleons)
-    pub isotope: u16,
-    /// Excited state status
-    pub state: IsomerState,
-}
-
-impl Nuclide {
-    /// A name for the nuclide with consistent formatting
-    ///
-    /// The nuclide name will be formatted as `<element><isotope number><state>`
-    /// to provide a display name with consistent formatting.
-    ///
-    /// For example:
-    ///
-    /// ```rust
-    /// # use ntools_iaea::{Nuclide, IsomerState};
-    /// # use std::str::FromStr;
-    /// let mut nuclide = Nuclide {
-    ///     symbol: "eu".to_string(),
-    ///     isotope: 152,
-    ///     state: IsomerState::Ground
-    /// };
-    ///
-    /// // Get a display name for the nuclide
-    /// assert_eq!(nuclide.name(), "Eu152");
-    ///
-    /// // Put into an excited state
-    /// nuclide.state = IsomerState::Excited(1);
-    ///
-    /// // Get a display name for the excited nuclide
-    /// assert_eq!(nuclide.name(), "Eu152m1");
-    /// ```
-    pub fn name(&self) -> String {
-        // special case for elements
-        let isotope = if self.isotope == 0 {
-            "".to_string()
-        } else {
-            self.isotope.to_string()
-        };
-
-        f!("{}{}{}", capitalise(&self.symbol), isotope, self.state)
-    }
-
-    /// Name of nuclide excluding state information
-    pub fn base_name(&self) -> String {
-        // special case for elements
-        let isotope = if self.isotope == 0 {
-            "".to_string()
-        } else {
-            self.isotope.to_string()
-        };
-
-        f!("{}{}", capitalise(&self.symbol), isotope)
-    }
-
-    /// Formmating for queries, which must be mass+element
-    pub fn query_name(&self) -> Result<String> {
-        // special case for elements
-        if self.isotope == 0 {
-            return Err(Error::InvalidNuclideQuery);
-        }
-
-        Ok(f!("{}{}", self.isotope, self.symbol.to_lowercase()))
-    }
-}
-
-impl std::str::FromStr for Nuclide {
-    type Err = crate::error::Error;
-
-    fn from_str(s: &str) -> Result<Self> {
-        let (_, nuclide) = nuclide_from_str(s)
-            .map_err(|_| Error::ParseError(f!("Could not convert {s} into a Nuclide")))?;
-
-        Ok(nuclide)
-    }
-}
-
-impl std::fmt::Display for Nuclide {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.name())
-    }
-}
-
 /// Variants of excited states
 ///
 /// A nuclide can either be in the ground state, or some excited state.
@@ -233,7 +113,7 @@ impl std::fmt::Display for Nuclide {
 /// Note that this may be converted from anything ending with the FISPACT-II
 /// notations of m, n, etc.. but it is not completely guaranteed that this is a
 /// 1:1 mapping.
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Default)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Deserialize, Default, Clone)]
 pub enum IsomerState {
     #[default]
     Ground,
@@ -250,7 +130,7 @@ impl std::fmt::Display for IsomerState {
     }
 }
 
-#[derive(Deserialize, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Deserialize, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct BaseNuclide {
     pub symbol: String,
     pub z: u16,
@@ -260,5 +140,164 @@ pub struct BaseNuclide {
 impl std::fmt::Display for BaseNuclide {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}{}", capitalise(&self.symbol), self.z + self.n)
+    }
+}
+
+/// Definition for a particular nuclide
+///
+/// The `TryFrom` trait is implemented for core string types and will try to
+/// parse them into a nuclide.
+///
+/// Expects `<element><separator><isotope><metastable>` at most but only the
+/// element is required. e.g.
+///
+/// - Element only => Co, C
+/// - Isotope => Co60, C12
+/// - Metastable => Co60m1 Co60m2 Co60m3 ...
+/// - Fispact => Co60m Co60n Co60mo
+///
+/// This order must be enforced because something like "104mn" is ambiguous.
+/// i.e. should it be interpreted as Mn-104 or N-104m?
+///
+/// Note that the metastable state should be the ENSDF notation (m1, m2, m3,
+/// etc...).
+///
+/// The metastable symbol can be converted from anything ending with the
+/// FISPACT-II notation of m, n, etc..., but it can not be guaranteed that
+/// this is a 1:1 mapping.
+///
+/// ```rust
+/// # use ntools_iaea::{Nuclide, IsomerState};
+/// // Get the variant from an IAEA symbol
+/// assert_eq!(
+///     Nuclide::try_from("eu-152m2").unwrap(),
+///     Nuclide {
+///         symbol: "eu".to_string(),
+///         isotope: 152,
+///         state: IsomerState::Excited(2)
+///     }
+/// );
+/// ```
+#[derive(Deserialize, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub struct Nuclide {
+    /// Element
+    pub symbol: String,
+    /// Isotope number (Z+N, total nucleons)
+    pub isotope: u16,
+    /// Excited state status
+    pub state: IsomerState,
+}
+
+impl Nuclide {
+    /// A basic name for the nuclide
+    ///
+    /// The nuclide name will be formatted as `<element><isotope number>`
+    /// to provide a display name with consistent formatting.
+    ///
+    /// For example:
+    ///
+    /// ```rust
+    /// # use ntools_iaea::{Nuclide, IsomerState};
+    /// let mut nuclide = Nuclide {
+    ///     symbol: "eu".to_string(),
+    ///     isotope: 152,
+    ///     state: IsomerState::Ground
+    /// };
+    ///
+    /// // Get a display name for the nuclide
+    /// assert_eq!(nuclide.name(), "Eu152");
+    /// ```
+    pub fn name(&self) -> String {
+        // special case for elements
+        let isotope = if self.isotope == 0 {
+            "".to_string()
+        } else {
+            self.isotope.to_string()
+        };
+
+        f!("{}{}", capitalise(&self.symbol), isotope)
+    }
+
+    /// A name for the nuclide including isomer state
+    ///
+    /// The nuclide name will be formatted as `<element><isotope number><state>`
+    ///
+    /// For example:
+    ///
+    /// ```rust
+    /// # use ntools_iaea::{Nuclide, IsomerState};
+    /// let nuclide = Nuclide {
+    ///     symbol: "eu".to_string(),
+    ///     isotope: 152,
+    ///     state: IsomerState::Excited(1)
+    /// };
+    ///
+    /// // Get a display name for the excited nuclide
+    /// assert_eq!(nuclide.name_with_state(), "Eu152m1");
+    /// ```
+    pub fn name_with_state(&self) -> String {
+        f!("{}{}", self.name(), self.state)
+    }
+
+    /// Name formatted for IAEA queries
+    ///
+    /// The IAEA API expects the nuclide as `<mass><element>` with no state
+    /// information.
+    ///
+    /// Calls to this method for elements (i.e. mass set to 0) will return an
+    /// error.
+    ///
+    /// For example:
+    ///
+    /// ```rust
+    /// # use ntools_iaea::{Nuclide, IsomerState};
+    /// let nuclide = Nuclide {
+    ///     symbol: "eu".to_string(),
+    ///     isotope: 152,
+    ///     state: IsomerState::Excited(1)
+    /// };
+    ///
+    /// // Get the format expected for the IAEA API query
+    /// assert_eq!(nuclide.query_name().unwrap(), "152eu");
+    /// ```
+    pub fn query_name(&self) -> Result<String> {
+        // special case for elements
+        if self.isotope == 0 {
+            return Err(Error::InvalidNuclideQuery);
+        }
+
+        Ok(f!("{}{}", self.isotope, self.symbol.to_lowercase()))
+    }
+}
+
+impl std::fmt::Display for Nuclide {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.name_with_state())
+    }
+}
+
+impl TryFrom<&str> for Nuclide {
+    type Error = crate::Error;
+
+    fn try_from(s: &str) -> std::result::Result<Self, Self::Error> {
+        let (_, nuclide) = nuclide_from_str(s).map_err(|_| crate::Error::FailedParseToNuclide {
+            text: s.to_string(),
+        })?;
+
+        Ok(nuclide)
+    }
+}
+
+impl TryFrom<String> for Nuclide {
+    type Error = crate::Error;
+    fn try_from(s: String) -> Result<Self> {
+        s.as_str().try_into()
+    }
+}
+
+impl TryFrom<&String> for Nuclide {
+    type Error = crate::Error;
+    fn try_from(s: &String) -> Result<Self> {
+        s.as_str().try_into()
     }
 }
