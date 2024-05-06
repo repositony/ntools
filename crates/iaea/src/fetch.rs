@@ -162,7 +162,10 @@ where
     N: TryInto<Nuclide> + Clone,
     <N as TryInto<Nuclide>>::Error: std::fmt::Debug,
 {
-    let nuclide: Nuclide = nuclide.try_into().unwrap();
+    let nuclide: Nuclide = nuclide
+        .try_into()
+        .map_err(|_| Error::FailedNuclideConversion)?;
+
     let url = &f!(
         "{IAEA_API}fields=decay_rads&nuclides={}&rad_types={}",
         nuclide.query_name()?,

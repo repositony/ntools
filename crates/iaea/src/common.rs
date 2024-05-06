@@ -280,7 +280,7 @@ impl TryFrom<&str> for Nuclide {
     type Error = crate::Error;
 
     fn try_from(s: &str) -> std::result::Result<Self, Self::Error> {
-        let (_, nuclide) = nuclide_from_str(s).map_err(|_| crate::Error::FailedParseToNuclide {
+        let (_, nuclide) = nuclide_from_str(s).map_err(|_| crate::Error::FailedStrToNuclide {
             text: s.to_string(),
         })?;
 

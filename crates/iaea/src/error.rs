@@ -24,7 +24,7 @@ pub enum Error {
     #[error("failed CSV operation")]
     Csv(#[from] csv::Error),
 
-    /// Unexpected length of bytes based on file content
+    /// Radiation type could not be infered from the provided string
     #[error("failed infer radiation type from \"{hint:?}\"")]
     CouldNotInferRadType { hint: String },
 
@@ -32,9 +32,13 @@ pub enum Error {
     #[error("failed binary (de)serialization")]
     FailedBinaryOp(#[from] Box<bincode::ErrorKind>),
 
-    /// Generic error type for nom parser results
+    /// Specific hinted Nuclide conversion error
     #[error("failed to parse \"{text:?}\" to Nuclide")]
-    FailedParseToNuclide { text: String },
+    FailedStrToNuclide { text: String },
+
+    /// Generic TryFrom/TryInto for Nuclide conversion
+    #[error("failed to coerce generic type into Nuclide")]
+    FailedNuclideConversion,
 
     /// Invalid nuclide state for IAEA API queries
     #[error("IAEA API does not allow elements")]
