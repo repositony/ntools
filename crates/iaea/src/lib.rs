@@ -1,38 +1,39 @@
 //! Query decay data directly from the IAEA chart of nuclides
 //!
-//! This crate is intended to make using decay data from the IAEA chart of nuclides
-//! API slightly less painful.
+//! This crate is intended to make using decay data from the IAEA chart of
+//! nuclides API slightly less painful.
 //!
-//! Data may be fetched directly from the IAEA for the latest data if an internet
-//! connection is available, or read from pre-fetched data (recommended).
+//! Decay data are made available by either:
+//! - Loading pre-fetched data (recommended)
+//! - Fetching directly from the API if an internet connection is available
 //!
 //! Fetch requests for large numbers of nuclides are parallelised.
 //!
-//! See <https://www-nds.iaea.org/relnsd/vcharthtml/api_v0_guide.html> for further
-//! information.
+//! See <https://www-nds.iaea.org/relnsd/vcharthtml/api_v0_guide.html> for
+//! further information.
 //!
 //! ## Implementation
 //!
-//! The structure remains relatively consistent with the CSV data returned from the
-//! IAEA.
+//! The structure remains relatively consistent with the CSV data returned from
+//! the IAEA.
 //!
-//! Every nuclide request returns a series of [Record]s. A coollection of these
-//! records is aliased to [RecordSet].
+//! Every nuclide request returns a series of [Record]s. A collection of these
+//! records is called a [RecordSet].
 //!
 //! For example:
 //!
 //! ```rust, no_run
-//! # use ntools_iaea::{Record,fetch_nuclide_records, RadType};
+//! # use ntools_iaea::{Record, fetch_nuclide, RadType, RecordSet};
 //! // Get all records for the Cobalt-60 nuclide
-//! let cobalt60: Vec<Record> = fetch_nuclide_records("co60", RadType::Gamma).unwrap();
+//! let cobalt60: RecordSet = fetch_nuclide("co60", RadType::Gamma).unwrap();
 //!
 //! // Find the 1173 keV emission as an example
-//! let example = cobalt60
+//! let example: &Record = cobalt60
 //!     .iter()
 //!     .find(|record| record.energy.unwrap() == 1173.228)
 //!     .unwrap();
 //!
-//! // Print a summary of the record
+//! // Print a summary of this record
 //! println!("{example}");
 //! ```
 //!
@@ -77,18 +78,18 @@ mod special;
 pub use common::{IsomerState, Nuclide, RadType};
 
 #[doc(inline)]
-pub use error::{Error, Result};
+pub use error::Error;
 
 #[doc(inline)]
 pub use record::{Record, RecordSet};
 
 #[doc(inline)]
-pub use load::{decode_binary_file, load_all_data, load_nuclide_records};
+pub use load::{load_all, load_available, load_nuclide, load_nuclides};
 
 #[doc(inline)]
 pub use fetch::{
-    fetch_all_data, fetch_available_nuclides, fetch_nuclide_records, fetch_raw_csv,
-    prefetch_binary, prefetch_json,
+    fetch_all, fetch_available, fetch_csv, fetch_nuclide, fetch_nuclides, prefetch_binary,
+    prefetch_json,
 };
 
 #[doc(inline)]
