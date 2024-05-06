@@ -33,12 +33,16 @@ pub enum Error {
     FailedBinaryOp(#[from] Box<bincode::ErrorKind>),
 
     /// Generic error type for nom parser results
-    #[error("parser failed")]
-    ParseError(String),
+    #[error("failed to parse \"{text:?}\" to Nuclide")]
+    FailedParseToNuclide { text: String },
 
     /// Invalid nuclide state for IAEA API queries
     #[error("IAEA API does not allow elements")]
     InvalidNuclideQuery,
+
+    /// Raised if the hashmap of collected nuclide data is empty
+    #[error("hashmap of collected nuclide data is empty")]
+    EmptyDataMap,
 
     /// Unexpected length of bytes based on file content
     #[error("failed to find \"{nuclide:?}\" for {rad_type:?}")]
