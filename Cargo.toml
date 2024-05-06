@@ -5,7 +5,7 @@ homepage     = "https://repositony.github.io/ntools/"
 license      = "GPL-3.0 license"
 repository   = "https://github.com/repositony/ntools"
 rust-version = "1.77"
-version      = "0.3.0"
+version      = "0.3.1"
 
 [package]
 authors.workspace      = true
