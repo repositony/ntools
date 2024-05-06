@@ -5,7 +5,7 @@ homepage     = "https://repositony.github.io/ntools/"
 license      = "GPL-3.0 license"
 repository   = "https://github.com/repositony/ntools"
 rust-version = "1.77"
-version      = "0.2.0"
+version      = "0.3.0"
 
 [package]
 authors.workspace      = true
@@ -69,17 +69,18 @@ ntools-weights = { version = "*", path = "crates/weights" }
 ntools-wwgen   = { version = "*", path = "crates/wwgen" }
 
 # external crates
-bincode    = "1.3"
-csv        = "1.2"
-itertools  = "0.12"
-kdam       = "0.5"
-log        = "0.4"
-minreq     = { version = "2.11", features = ["https-rustls"] }
-nom        = "7.1"
-rayon      = "1.8"
-serde      = "1.0"
-serde_json = "1.0"
-stderrlog  = "0.6"
-textwrap   = "0.16"
-thiserror  = "1.0"
+bincode    = "1.3.3"
+csv        = "1.3.0"
+indicatif  = { version = "0.17.8", features = ["rayon"] }
+itertools  = "0.12.1"
+kdam       = "0.5.1"
+log        = "0.4.21"
+minreq     = { version = "2.11.2", features = ["https-rustls"] }
+nom        = "7.1.3"
+rayon      = "1.10.0"
+serde      = "1.0.200"
+serde_json = "1.0.116"
+stderrlog  = "0.6.0"
+textwrap   = "0.16.1"
+thiserror  = "1.0.59"
 vtkio      = { git = "https://github.com/elrnv/vtkio.git", rev = "0c14e90" }

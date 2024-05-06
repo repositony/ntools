@@ -6,7 +6,6 @@ homepage.workspace     = true
 keywords               = ["decay-data", "iaea", "neutronics", "ntools"]
 license.workspace      = true
 name                   = "ntools-iaea"
-readme                 = "readme.md"
 repository.workspace   = true
 rust-version.workspace = true
 version.workspace      = true
@@ -14,7 +13,7 @@ version.workspace      = true
 [dependencies]
 bincode       = { workspace = true }
 csv           = { workspace = true }
-kdam          = { features = ["rayon", "template"], workspace = true }
+indicatif     = { workspace = true }
 log           = { workspace = true }
 minreq        = { workspace = true }
 nom           = { workspace = true }
