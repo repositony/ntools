@@ -2,6 +2,7 @@
 
 // internal modules
 use crate::common::{IsomerState, Nuclide};
+use ntools_format::capitalise;
 
 // external crates
 use log::warn;
@@ -29,7 +30,7 @@ use nom::{self, Err, IResult};
 /// Must enforce because things like 104mn is ambiguous -> Mn-104 or N-104m?
 /// No guarentee fispact aligns with the m1 m2 m3 of the IAEA data
 pub(crate) fn nuclide_from_str(i: &str) -> IResult<&str, Nuclide> {
-    let (i, element) = alpha1(i)?;
+    let (i, element) = element(i)?;
     let (i, _) = opt(separator)(i)?;
     let (i, isotope) = opt(isotope)(i)?;
 
@@ -47,11 +48,22 @@ pub(crate) fn nuclide_from_str(i: &str) -> IResult<&str, Nuclide> {
     Ok((
         i,
         Nuclide {
+            symbol: capitalise(element),
             isotope: isotope.unwrap_or(000),
-            symbol: element.to_string(),
             state: isomer_state,
         },
     ))
+}
+
+/// Get the element symbol
+fn element(i: &str) -> IResult<&str, &str> {
+    let (i, element) = alpha1(i)?;
+
+    if element.len() > 2 {
+        Err(Err::Error(Error::new(i, ErrorKind::Fail)))
+    } else {
+        Ok((i, element))
+    }
 }
 
 /// Get an unsigned integer value
@@ -84,7 +96,7 @@ fn numbered_isomer(i: &str) -> IResult<&str, IsomerState> {
 /// Get the isomer type from known fispact/common use symbols
 fn symbol_isomer(i: &str) -> IResult<&str, IsomerState> {
     match i {
-        "g" | "" => Ok((i, IsomerState::Excited(0))),
+        "g" | "" => Ok((i, IsomerState::Ground)),
         "m" | "*" => Ok((i, IsomerState::Excited(1))),
         "n" => Ok((i, IsomerState::Excited(2))),
         "o" => Ok((i, IsomerState::Excited(3))),
