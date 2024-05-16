@@ -172,7 +172,7 @@ impl std::fmt::Display for BaseNuclide {
 /// assert_eq!(
 ///     Nuclide::try_from("eu-152m2").unwrap(),
 ///     Nuclide {
-///         symbol: "eu".to_string(),
+///         symbol: "Eu".to_string(),
 ///         isotope: 152,
 ///         state: IsomerState::Excited(2)
 ///     }
