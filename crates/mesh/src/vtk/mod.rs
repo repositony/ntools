@@ -202,3 +202,21 @@ impl Vertex {
         (factor * value).round() / factor
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use nalgebra::{Rotation3, Vector3};
+
+    #[test]
+    fn rotation_test() {
+        let axs_def = Vector3::from([0.0, 0.0, 1.0]);
+        let axs_new = Vector3::from([0.5, 0.5, 0.0]);
+
+        let rotation = Rotation3::face_towards(&axs_new, &axs_def);
+        println!("{:?}", rotation);
+
+        println!("{:?}", rotation.transform_vector(&axs_def));
+    }
+}
