@@ -187,6 +187,11 @@ impl Vertex {
         self
     }
 
+    /// Translate the points around an axis by some rotation matrix
+    pub fn rotate(mut self, origin: &[f64; 3]) -> Vertex {
+        todo!()
+    }
+
     /// Force rounding of f64 to 5 decimal places
     ///
     /// Makes absolutely sure the vertex points are not slightly off due to f64
