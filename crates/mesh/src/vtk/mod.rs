@@ -209,6 +209,16 @@ mod tests {
 
     use nalgebra::{Rotation3, Vector3};
 
+    fn project_vector(axs: &Vector3<f64>, vec: &Vector3<f64>) -> Vector3<f64> {
+        let n = axs.normalize();
+        let u = vec.normalize();
+
+        let a = u.dot(&n) / n.norm_squared();
+        let b = a * n;
+
+        (u - b).normalize()
+    }
+
     #[test]
     fn rotation_test() {
         let axs_def = Vector3::from([0.0, 0.0, 1.0]);
@@ -218,5 +228,11 @@ mod tests {
         println!("{:?}", rotation);
 
         println!("{:?}", rotation.transform_vector(&axs_def));
+        println!("{:?}", rotation.transform_vector(&axs_def).normalize());
+        println!("{:?}", rotation.transform_vector(&axs_def).norm());
+
+        let axs = Vector3::from([0.0, 0.0, 1.0]);
+        let vec = Vector3::from([-0.5, 0.2, -0.5]);
+        println!("Projection: {:?}", project_vector(&axs, &vec));
     }
 }
