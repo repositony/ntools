@@ -14,6 +14,7 @@ version.workspace      = true
 [dependencies]
 kdam          = { features = ["template"], workspace = true }
 log           = { workspace = true }
+nalgebra      = { workspace = true }
 nom           = { workspace = true }
 ntools-format = { workspace = true }
 serde         = { workspace = true }
@@ -22,7 +23,7 @@ thiserror     = { workspace = true }
 vtkio         = { workspace = true }
 
 [dev-dependencies]
-rstest = "0.18"
+rstest = "0.21"
 
 [lib]
 doctest = true
