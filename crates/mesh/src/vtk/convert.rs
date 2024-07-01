@@ -660,10 +660,8 @@ impl MeshToVtk {
         let axs_default = [0.0, 0.0, 1.0];
 
         if axs_default == *axis {
-            println!("No rotation matrix needed");
             None
         } else {
-            println!("Rotation matrix needed");
             let axs_default = Vector3::from(axs_default);
             let axs_user = Vector3::from([axis[0], axis[1], axis[2]]);
             Some(Rotation::face_towards(&axs_user, &axs_default))
