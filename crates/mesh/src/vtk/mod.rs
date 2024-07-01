@@ -85,6 +85,7 @@ pub use builder::MeshToVtkBuilder;
 #[doc(inline)]
 pub use convert::MeshToVtk;
 
+use nalgebra::{Rotation, Vector3};
 use std::path::Path;
 use vtkio::model::ByteOrder;
 use vtkio::Vtk;
@@ -177,6 +178,17 @@ impl Vertex {
     /// turn vertex into a vector, rounding to 5 decimal places for consistency
     pub fn as_array(&self) -> [f64; 3] {
         [Self::rnd(self.x), Self::rnd(self.y), Self::rnd(self.z)]
+    }
+
+    /// Rotate a point about the origin
+    pub fn rotate(mut self, rotation: &Option<Rotation<f64, 3>>) -> Vertex {
+        if let Some(r) = rotation {
+            let a = r.transform_vector(&Vector3::from(self.as_array()));
+            self.x = a[0];
+            self.y = a[1];
+            self.z = a[2];
+        };
+        self
     }
 
     /// Pass along simple translations by (x,y,z) cartesian coordinates
