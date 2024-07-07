@@ -3,12 +3,18 @@ use ntools_format::f;
 
 use serde::{de::Error, Deserialize, Deserializer, Serialize};
 
-/// Interval/time step data
+/// Data for a time step in the calculation
 ///
-/// Modifications
-/// - mass automatically converted to grams for consistency
-/// - totals renamed for brevity
-/// - dose converted to more concise [Dose] structure
+/// Traditionally this is all data written when the `ATOMS` keyword is used on a
+/// irradiation or cooling step.
+///  
+/// # Important differences to the JSON structure
+///
+/// The following choices were made during deserialisation:
+/// - All masses are automatically converted to grams
+/// - All `"total_*"` keys are shortened for brevity
+///     - e.g. `total_activity` is shortened to `activity`
+/// - The dose rate dictionaries are converted to more concise [Dose] structures
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Interval {
     /// Irradiation time (s)
@@ -174,8 +180,9 @@ impl Interval {
 
 /// Total sample dose rate and type
 ///
-/// Note this is not the same as the original to make this more ergonomic and
-/// usable for programming.
+/// Note that this is not directly translated from the original JSON structure.
+/// Instead, the deserialiser was written to make this more ergonomic and
+/// properly leverage the type system.
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Dose {
     /// Dose rate (Sv/hr)

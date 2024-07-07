@@ -56,7 +56,7 @@ The decision was made to split the command line tools and core libraries into
 separate repositories for better maintainability, scalability, and shorter
 compile times.
 
-### Crates
+### Modular crates
 
 `ntools` is a collection of utility crates that can be used individually or in
 combination.
@@ -66,7 +66,7 @@ The `ntools` crates are included as dependencies through feature flags. Specify
 
 ```toml
 [dependencies]
-ntools = { features = ["full"], git = "https://github.com/repositony/ntools.git" }
+ntools = { git = "https://github.com/repositony/ntools.git", features = ["full"] }
 ```
 
 However, it is strongly recommended that users are selective to avoid compiling
@@ -76,7 +76,7 @@ For example, if only the `fispact` and `iaea` crates are needed:
 
 ```toml
 [dependencies]
-ntools = { features = ["fispact", "iaea"], git = "https://github.com/repositony/ntools.git" }
+ntools = { git = "https://github.com/repositony/ntools.git", features = ["fispact", "iaea"] }
 ```
 
 ### Documentation and Tests

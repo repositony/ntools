@@ -6,7 +6,7 @@
 //! Currently the JSON output is fully deserialised to useful structures. The
 //! TAB and legacy output files will be supported as needed.
 //!
-//! ## Quickstart example
+//! # Quickstart example
 //!
 //! To quickly load a JSON inventory into structures for further analysis, this
 //! is a simple read.
@@ -17,32 +17,35 @@
 //! let inventory: Inventory = read_json("path/to/results.json").unwrap();
 //! ```
 //!
-//! ## Core concepts
+//! # Core concepts
 //!
 //! The library is structured much like the output files for simplicity.
 //!
-//! An [Inventory] contains metadata about the run in [RunData], and a list of
-//! [Interval]s for every step of the inventory calculation. An [Interval]
-//! describes overall totals for the sample, a list of every [Nuclide] present,
-//! and a basic histogram of gamma lines for FISPACT-II v5.
+//! - [Inventory] - all data deserialised from the JSON
+//!     - [RunData] - metadata about the run
+//!     - [Interval]s - list of intervals for every step of the calculation
+//!         - [Nuclide]s - list of nuclides and their associated data
+//!         - [Spectrum] - basic histogram of gamma lines for FISPACT-II v5.
 //!
-//! ### Important naming changes
+//! ## Important name changes
 //!
 //! Several tweaks were made to the deserialiser and data structures are not
 //! entirely a 1:1 match for the JSON dictionary.
 //!
-//! #### Sample mass
+//! #### Changes to sample mass
 //!
-//! The masses are inconsistent between nuclides and the interval, often leading to
-//! people forgetting to change the units to/from grams/kilograms.
+//! The masses are inconsistent between nuclides and the interval, often leading
+//! to//! people forgetting to change the units to and from grams or kilograms.
 //!
-//! This is converted to grams in the background such that [Nuclide.mass] and
-//! [Interval.mass] are consistent.
+//! All masses are **converted to grams** in the background such that [Nuclide]
+//! and [Interval] mass values are consistent.
 //!
-//! #### Sample dose
+//! #### Changes to sample dose
 //!
-//! The sample dose rate for the interval is converted into something more useful
-//! that is concise and works better with the type system.
+//! The sample dose rate for the interval is converted into something more
+//! concise that works better with the type system.
+//!
+//! For example:
 //!
 //! ```json
 //! "dose_rate": {
@@ -73,10 +76,11 @@
 //! }
 //! ```
 //!
-//! #### Sample totals
+//! #### Changes to sample totals
 //!
-//! Several of the main sample totals have been renamed for brevity. For example,
-//! at the [Interval] level:
+//! Several of the main sample totals have been renamed for brevity throughout.
+//!
+//! For example:
 //!
 //! ```json
 //! "inventory_data": [
@@ -88,6 +92,8 @@
 //!     }
 //! ]
 //! ```
+//!
+//! becomes:
 //!
 //! ```rust, no_run
 //! struct Interval {
