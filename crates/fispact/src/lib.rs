@@ -119,8 +119,9 @@ pub use nuclide::{Nuclide, Stability};
 pub use inventory::{Inventory, RunData};
 
 #[doc(inline)]
-pub use error::{Error, Result};
+pub use error::Error;
 
+use error::Result;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;

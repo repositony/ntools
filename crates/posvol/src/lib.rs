@@ -58,4 +58,4 @@ pub use reader::read_posvol_file;
 pub use writer::{write_ascii, write_ascii_pretty, write_json};
 
 #[doc(inline)]
-pub use error::{Error, Result};
+pub use error::Error;

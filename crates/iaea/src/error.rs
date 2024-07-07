@@ -3,7 +3,7 @@
 use crate::RadType;
 
 /// Type alias for `Result<T, iaea::Error>`
-pub type Result<T> = core::result::Result<T, Error>;
+pub(crate) type Result<T> = core::result::Result<T, Error>;
 
 #[derive(thiserror::Error, Debug)]
 /// The error type for `ntools-iaea`

@@ -1,7 +1,7 @@
 //! Result and Error types for the posvol module
 
 /// Type alias for `Result<T, posvol::Error>`
-pub type Result<T> = core::result::Result<T, Error>;
+pub(crate) type Result<T> = core::result::Result<T, Error>;
 
 #[derive(thiserror::Error, Debug)]
 /// The error type for `ntools-posvol`

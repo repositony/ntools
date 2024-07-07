@@ -112,3 +112,6 @@ pub use magic::{mesh_to_ww, mesh_to_ww_advanced};
 
 #[doc(inline)]
 pub use bude::extrapolate_density;
+
+#[doc(inline)]
+pub use error::Error;

@@ -73,7 +73,7 @@ mod weight_window;
 pub use crate::weight_window::WeightWindow;
 
 #[doc(inline)]
-pub use crate::error::{Error, Result};
+pub use crate::error::Error;
 
 #[doc(inline)]
 pub use crate::operations::{write_multi_particle, write_single_particle};

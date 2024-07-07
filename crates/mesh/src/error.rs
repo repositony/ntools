@@ -1,7 +1,7 @@
 //! Result and Error types for ntools-meshtal
 
 /// Type alias for Result<T, mesh::Error>
-pub type Result<T> = core::result::Result<T, Error>;
+pub(crate) type Result<T> = core::result::Result<T, Error>;
 
 /// The error type for the `ntools-mesh` crate
 #[derive(thiserror::Error, Debug)]

@@ -1,7 +1,7 @@
 //! Result and Error types for ntools-weights
 
 /// Type alias for Result<T, weights::Error>
-pub type Result<T> = core::result::Result<T, Error>;
+pub(crate) type Result<T> = core::result::Result<T, Error>;
 
 /// The error type for the `ntools-weights` crate
 #[derive(thiserror::Error, Debug)]

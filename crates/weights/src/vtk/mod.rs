@@ -82,7 +82,8 @@ pub use builder::WeightsToVtkBuilder;
 #[doc(inline)]
 pub use convert::WeightsToVtk;
 
-use crate::{Result, WeightWindow};
+use crate::error::Result;
+use crate::WeightWindow;
 use std::path::Path;
 use vtkio::model::ByteOrder;
 use vtkio::Vtk;
