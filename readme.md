@@ -56,44 +56,32 @@ The decision was made to split the command line tools and core libraries into
 separate repositories for better maintainability, scalability, and shorter
 compile times.
 
-### Features
+### Crates
 
 `ntools` is a collection of utility crates that can be used individually or in
-combination to easily build more advanced anaysis tools.
-
-The structure is heavily inspired by the [gloo](https://github.com/rustwasm/gloo)
-approach. These modules are often used in combination, so I find it an excellent
-compromise between the conveniece of a large single library and the modularity
-of many individual repositories.
-
-#### Crate selection
+combination.
 
 The `ntools` crates are included as dependencies through feature flags. Specify
 `"full"` to include everything.
 
 ```toml
 [dependencies]
-ntools = { git = "https://github.com/repositony/ntools.git", features = ["full"] }
+ntools = { features = ["full"], git = "https://github.com/repositony/ntools.git" }
 ```
 
 However, it is strongly recommended that users are selective to avoid compiling
 unnecessary dependencies.
 
-For example, perhaps there is a need to generate an SDEF source of gamma
-emissions from a FISPACT-II JSON.
+For example, if only the `fispact` and `iaea` crates are needed:
 
 ```toml
 [dependencies]
-ntools = { git = "https://github.com/repositony/ntools.git", features = ["fispact", "iaea"] }
+ntools = { features = ["fispact", "iaea"], git = "https://github.com/repositony/ntools.git" }
 ```
-
-This will compile only the `fispact` and `iaea` crates. The first has various
-tools for interpreting and manipulating FISPACT-II output data, while the latter
-can use the IAEA chart of nuclides decay data to define a source.
 
 ### Documentation and Tests
 
-To produce the full library documentation seen
+To reproduce the full library documentation seen
 [here](https://repositony.github.io/ntools/index.html), specify the `"full"`
 feature flag.
 
