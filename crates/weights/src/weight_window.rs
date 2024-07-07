@@ -352,7 +352,7 @@ impl WeightWindow {
         if self.t.len() > 1 {
             for t in &self.t {
                 s += &f!("{:>13}", t.sci(5, 2));
-                s += &track_newlines(&mut count, 6);
+                s += track_newlines(&mut count, 6);
             }
             s += "\n";
         }
@@ -361,7 +361,7 @@ impl WeightWindow {
         count = 1;
         for e in &self.e {
             s += &f!("{:>13}", e.sci(5, 2));
-            s += &track_newlines(&mut count, 6);
+            s += track_newlines(&mut count, 6);
         }
         s += "\n";
 
@@ -370,7 +370,7 @@ impl WeightWindow {
         count = 1;
         for w in &self.weights {
             s += &f!("{:>13}", w.sci(5, 2));
-            s += &track_newlines(&mut count, 6);
+            s += track_newlines(&mut count, 6);
         }
 
         // don't add a newline if it happens to end in one already

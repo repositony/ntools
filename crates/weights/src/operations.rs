@@ -159,7 +159,7 @@ fn combined_header(weight_windows: &[&WeightWindow], padded: bool) -> String {
     if iv == 2 {
         for n_times in nt {
             s += &f!("{:>10}", n_times);
-            s += &track_newlines(&mut count, 7); // 7i10 => split on 7
+            s += track_newlines(&mut count, 7); // 7i10 => split on 7
         }
         if !s.ends_with('\n') {
             s += "\n";
@@ -170,7 +170,7 @@ fn combined_header(weight_windows: &[&WeightWindow], padded: bool) -> String {
     count = 1;
     for n_energies in ne {
         s += &f!("{:>10}", n_energies);
-        s += &track_newlines(&mut count, 7); // 7i10 => split on 7
+        s += track_newlines(&mut count, 7); // 7i10 => split on 7
     }
 
     if !s.ends_with('\n') {
