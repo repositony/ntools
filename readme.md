@@ -24,10 +24,10 @@ Un-linked tools will be made public when I have time to clean them up.
 
 | Command line   | Description                                             |
 | -------------- | ------------------------------------------------------- |
-| [mesh2vtk](https://github.com/repositony/mesh2vtk) | Convert any meshtal tally to various VTK formats        |
+| [mesh2vtk](https://github.com/repositony/mesh2vtk)   | Convert any meshtal tally to various VTK formats        |
 | [splitmesh](https://github.com/repositony/splitmesh) | Split meshtal tallies into individual files             |
 | [posvol](https://github.com/repositony/posvol)       | Inspect and convert binary UKAEA CuV posvol files       |
-| `mesh2ww`   | Convert any meshtal tally to a mesh-based global weight windows |
+| [mesh2ww](https://github.com/repositony/mesh2ww)     | Convert any meshtal tally to a mesh-based global weight windows |
 | `decaydata` | CLI for all decays data information from the IAEA chart of nuclides |
 | `fisdef`    | Generate source cards of any decay type from FISPACT-II inventories |
 | `fisjson`   | General convenience tools for quickly assessing FISPACT-II inventories |
