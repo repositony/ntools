@@ -12,15 +12,15 @@ rust-version.workspace = true
 version.workspace      = true
 
 [dependencies]
-kdam          = { features = ["template"], workspace = true }
-log           = { workspace = true }
-nalgebra      = { workspace = true }
-nom           = { workspace = true }
-ntools-format = { workspace = true }
-serde         = { workspace = true }
-serde_json    = { workspace = true }
-thiserror     = { workspace = true }
-vtkio         = { workspace = true }
+kdam           = { features = ["template"], workspace = true }
+log            = { workspace = true }
+nalgebra       = { workspace = true }
+nom            = { workspace = true }
+ntools-support = { workspace = true }
+serde          = { workspace = true }
+serde_json     = { workspace = true }
+thiserror      = { workspace = true }
+vtkio          = { workspace = true }
 
 [dev-dependencies]
 rstest = "0.21"

@@ -4,7 +4,7 @@
 use serde::Deserialize;
 
 // ntools modules
-use ntools_format::{capitalise, f};
+use ntools_support::{f, StringExt};
 
 // internal modules
 use crate::error::{Error, Result};
@@ -139,7 +139,7 @@ pub struct BaseNuclide {
 
 impl std::fmt::Display for BaseNuclide {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}{}", capitalise(&self.symbol), self.z + self.n)
+        write!(f, "{}{}", &self.symbol.capitalise(), self.z + self.n)
     }
 }
 
@@ -215,7 +215,7 @@ impl Nuclide {
             self.isotope.to_string()
         };
 
-        f!("{}{}", capitalise(&self.symbol), isotope)
+        f!("{}{}", &self.symbol.capitalise(), isotope)
     }
 
     /// A name for the nuclide including isomer state

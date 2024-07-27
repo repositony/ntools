@@ -201,7 +201,7 @@ where
 ///
 /// ```rust, no_run
 /// # use ntools_iaea::{fetch_nuclide, Record, Nuclide, RadType};
-/// # use ntools_format::OptionFormat;
+/// # use ntools_support::OptionExt;
 /// // Try to get the records for Sodium-22
 /// let records: Vec<Record> = fetch_nuclide("na22", RadType::Gamma).unwrap();
 ///
@@ -249,7 +249,7 @@ where
 ///
 /// ```rust, no_run
 /// # use ntools_iaea::{fetch_nuclides, Record, Nuclide, RadType};
-/// # use ntools_format::OptionFormat;
+/// # use ntools_support::OptionExt;
 /// // Try to get the records for Sodium-22 and Cesium-137
 /// let nuclide_data = fetch_nuclides(&["na22", "cs137"], RadType::Gamma);
 ///

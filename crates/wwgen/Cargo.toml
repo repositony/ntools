@@ -14,8 +14,8 @@ version.workspace      = true
 [dependencies]
 itertools      = { workspace = true }
 log            = { workspace = true }
-ntools-format  = { workspace = true }
 ntools-mesh    = { workspace = true }
+ntools-support = { workspace = true }
 ntools-weights = { workspace = true }
 thiserror      = { workspace = true }
 

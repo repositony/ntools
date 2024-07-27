@@ -2,7 +2,7 @@
 
 // internal modules
 use crate::common::{IsomerState, Nuclide};
-use ntools_format::capitalise;
+use ntools_support::StringExt;
 
 // external crates
 use log::warn;
@@ -48,7 +48,7 @@ pub(crate) fn nuclide_from_str(i: &str) -> IResult<&str, Nuclide> {
     Ok((
         i,
         Nuclide {
-            symbol: capitalise(element),
+            symbol: element.capitalise(),
             isotope: isotope.unwrap_or(000),
             state: isomer_state,
         },

@@ -18,7 +18,7 @@ use bincode::deserialize;
 
 /// Deserialise binary posvol file
 ///
-/// Returns a [Result] containing a [Posvol] struct with all the information
+/// Returns a Result containing a [Posvol] struct with all the information
 /// extracted from a CuV posvol file at `path`.
 ///
 /// ```rust

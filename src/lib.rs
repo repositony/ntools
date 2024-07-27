@@ -5,9 +5,9 @@
 #![deny(missing_docs, missing_debug_implementations)]
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 
-// Re-exports of default crates
+// Flatten the default crates
 #[doc(inline)]
-pub use ntools_format as format;
+pub use ntools_support::*;
 
 // Re-exports of crates that are behind feature flags
 #[cfg(feature = "fispact")]

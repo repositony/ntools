@@ -1,0 +1,18 @@
+[package]
+authors.workspace      = true
+description            = "Common supporting utilities for ntools crates"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["formatting", "neutronics", "ntools", "utilities"]
+license.workspace      = true
+name                   = "ntools-support"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

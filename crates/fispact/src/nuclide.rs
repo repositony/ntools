@@ -1,4 +1,4 @@
-use ntools_format::{capitalise, f};
+use ntools_support::{f, StringExt};
 use serde::{Deserialize, Serialize};
 
 /// Basic satbility variants
@@ -58,7 +58,7 @@ impl Nuclide {
     pub fn name(&self) -> String {
         f!(
             "{}{}{}",
-            capitalise(&self.element),
+            &self.element.capitalise(),
             self.isotope,
             self.state
         )

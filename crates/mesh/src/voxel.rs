@@ -1,7 +1,7 @@
 //! Module for voxel-related data and implementations
 
 // ntools modules
-use ntools_format::NumFormat;
+use ntools_support::FloatExt;
 
 // standard library
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};

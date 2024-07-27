@@ -6,7 +6,7 @@ use std::io::{BufWriter, Write};
 use crate::weight_window::WeightWindow;
 
 // ntools modules
-use ntools_format::f;
+use ntools_support::f;
 
 /// Convenience function for writing a [WeightWindow] into a single wwout file
 ///

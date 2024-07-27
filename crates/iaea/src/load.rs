@@ -87,7 +87,7 @@ pub fn load_available(rad_type: RadType) -> Result<Vec<Nuclide>> {
 ///
 /// ```rust
 /// # use ntools_iaea::{load_nuclide, Record, Nuclide, RadType};
-/// # use ntools_format::OptionFormat;
+/// # use ntools_support::OptionExt;
 /// // Try to get the records for Sodium-22
 /// let records: Vec<Record> = load_nuclide("na22", RadType::Gamma).unwrap();
 ///
@@ -131,7 +131,7 @@ where
 ///
 /// ```rust
 /// # use ntools_iaea::{load_nuclides, Record, Nuclide, RadType};
-/// # use ntools_format::OptionFormat;
+/// # use ntools_support::OptionExt;
 /// // Try to get the records for Sodium-22 and Cesium-137
 /// let nuclide_data = load_nuclides(&["na22", "cs137"], RadType::Gamma);
 ///

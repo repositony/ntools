@@ -1,4 +1,4 @@
-use ntools_format::{f, OptionFormat};
+use ntools_support::{f, OptionExt};
 use serde::{Deserialize, Serialize};
 
 /// Collection of specialised data fields under one type

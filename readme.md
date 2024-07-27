@@ -45,7 +45,7 @@ common fusion neutronics tasks and analysis.
 | Crate | Description |
 | ----- | ----------- |
 | [fispact](https://repositony.github.io/ntools/ntools/fispact/index.html) | Analysis tools for FISPACT-II inventory calculations  |
-| [format](https://repositony.github.io/ntools/ntools/format/index.html)   | Common utility for extended `std` type formatting     |
+| [support](https://repositony.github.io/ntools/ntools/support/index.html)   | Common utilities and extension traits     |
 | [iaea](https://repositony.github.io/ntools/ntools/iaea/index.html)       | Module for interacting with the IAEA decay data API   |
 | [mesh](https://repositony.github.io/ntools/ntools/mesh/index.html)       | MCNP mesh tally operations and file parsing           |
 | [posvol](https://repositony.github.io/ntools/ntools/posvol/index.html)   | Se/deserialiser for UKAEA CuV posvol binaries         |

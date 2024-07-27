@@ -6,7 +6,7 @@ use crate::particle::Particle;
 use crate::voxel::{Group, Voxel, VoxelCoordinate};
 
 // ntools modules
-use ntools_format::{f, NumFormat};
+use ntools_support::{f, FloatExt};
 
 // standard library
 use core::fmt;
