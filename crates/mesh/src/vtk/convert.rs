@@ -412,9 +412,8 @@ impl MeshToVtk {
         let rotation_axs = Self::init_rotation(&mesh.axs);
         let rotation_vec = mesh.vec[1].atan2(mesh.vec[0]);
 
-        // go layer-by-layer up from z
+        // first inner segments always CellType::Wedge
         for layer in 0..mesh.jints {
-            // first inner segments always CellType::Wedge
             self.wedge_segments(
                 mesh,
                 layer,
@@ -424,11 +423,13 @@ impl MeshToVtk {
                 &rotation_axs,
                 rotation_vec,
             );
+        }
 
-            // any additional ring segments use CellType::Voxel
-            if mesh.iints > 1 {
-                // start from 1, the first ring is already made from wedges
-                for ring in 1..mesh.iints {
+        // any additional ring segments use CellType::Voxel
+        if mesh.iints > 1 {
+            // start from 1, the first ring is already made from CellType::Wedge
+            for ring in 1..mesh.iints {
+                for layer in 0..mesh.jints {
                     self.voxel_segments(
                         mesh,
                         ring,
@@ -451,7 +452,7 @@ impl MeshToVtk {
     fn wedge_segments(
         &self,
         mesh: &Mesh,
-        z_idx: usize,
+        layer: usize,
         points: &mut Vec<f64>,
         offsets: &mut Vec<u64>,
         cell_types: &mut Vec<CellType>,
@@ -474,7 +475,7 @@ impl MeshToVtk {
             let x1 = r * t1.cos();
             let y1 = r * t1.sin();
 
-            for idx in z_idx..=(z_idx + 1) {
+            for idx in layer..=(layer + 1) {
                 let z = mesh.jmesh[idx];
                 points.extend(
                     Vertex { x: 0.0, y: 0.0, z }
@@ -506,8 +507,8 @@ impl MeshToVtk {
     fn voxel_segments(
         &self,
         mesh: &Mesh,
-        r_idx: usize,
-        z_idx: usize,
+        ring: usize,
+        layer: usize,
         points: &mut Vec<f64>,
         offsets: &mut Vec<u64>,
         cell_types: &mut Vec<CellType>,
@@ -516,8 +517,9 @@ impl MeshToVtk {
     ) {
         let mut step = 2.0 * std::f64::consts::PI / (mesh.kints as f64);
         step /= self.get_resolution(&mesh.kints) as f64;
-        let r0 = mesh.imesh[r_idx];
-        let r1 = mesh.imesh[r_idx + 1];
+
+        let r0 = mesh.imesh[ring - 1];
+        let r1 = mesh.imesh[ring];
 
         // voxel type has 8 verticies
         // only need to find 4 and then repeat at lower layer
@@ -537,8 +539,9 @@ impl MeshToVtk {
             let x11: f64 = r1 * t1.cos();
             let y11: f64 = r1 * t1.sin();
 
-            for idx in z_idx..=(z_idx + 1) {
+            for idx in layer..=(layer + 1) {
                 let z = mesh.jmesh[idx];
+
                 points.extend(
                     Vertex { x: x00, y: y00, z }
                         .rotate(rotation_axs)
@@ -575,22 +578,19 @@ impl MeshToVtk {
         let mut attributes: Attributes = Attributes::new();
         let energy_groups = self.collect_energy_group_idx(mesh);
         let time_groups = self.collect_time_group_idx(mesh);
-        let cyl_cell_order = self.cylinder_cell_order(mesh);
 
         for e_idx in &energy_groups {
             for t_idx in &time_groups {
                 let voxels = mesh.slice_voxels_by_idx(*e_idx, *t_idx).unwrap();
 
-                let (mut results, mut errors): (Vec<f64>, Vec<f64>) = cyl_cell_order
+                let (mut results, mut errors): (Vec<f64>, Vec<f64>) = voxels
                     .iter()
-                    .map(|i| (voxels[*i].result, voxels[*i].error))
+                    .map(|v| (v.result, v.error))
                     .collect::<Vec<(f64, f64)>>()
                     .into_iter()
                     .unzip();
 
                 results = Self::repeat_values(results, self.get_resolution(&mesh.kints));
-
-                errors = Self::repeat_values(errors, self.get_resolution(&mesh.kints));
 
                 let cell_data = DataArray {
                     name: self.group_name_visit(mesh, *e_idx, *t_idx),
@@ -604,6 +604,8 @@ impl MeshToVtk {
 
                 // do the same for the errors if they are to be included
                 if self.include_errors {
+                    errors = Self::repeat_values(errors, self.get_resolution(&mesh.kints));
+
                     let cell_data = DataArray {
                         name: self.group_name_visit(mesh, *e_idx, *t_idx) + "_error",
                         elem: ElementType::Scalars {
@@ -666,19 +668,5 @@ impl MeshToVtk {
             let axs_user = Vector3::from([axis[0], axis[1], axis[2]]);
             Some(Rotation::face_towards(&axs_user, &axs_default))
         }
-    }
-
-    /// Get the correct ordering for matching voxels to cylinder vtk cells
-    fn cylinder_cell_order(&self, mesh: &Mesh) -> Vec<usize> {
-        let mut index: Vec<(usize, usize)> = (0..mesh.n_voxels_per_group())
-            .map(|idx| {
-                let (_, _, i, j, k) = mesh.voxel_index_to_etijk(idx);
-                let key = k + (i * mesh.kints) + (j * mesh.iints * mesh.kints);
-                (idx, key)
-            })
-            .collect();
-
-        index.sort_by_key(|&(_, key)| key);
-        index.into_iter().map(|(i, _)| i).collect()
     }
 }
