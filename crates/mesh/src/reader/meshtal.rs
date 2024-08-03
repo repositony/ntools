@@ -6,7 +6,7 @@ use crate::reader::parsers;
 use crate::voxel::{Group, Voxel};
 
 // ntools modules
-use ntools_support::f;
+use ntools_utils::f;
 
 // standard library
 use std::collections::HashMap;

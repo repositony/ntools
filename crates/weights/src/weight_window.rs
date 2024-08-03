@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 
 // ntools modules
-use ntools_support::{f, FloatExt};
+use ntools_utils::{f, ValueExt};
 
 // internal modules
 use crate::operations::track_newlines;

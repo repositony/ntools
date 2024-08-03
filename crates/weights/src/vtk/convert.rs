@@ -2,7 +2,7 @@
 use std::ops::RangeInclusive;
 
 // ntools modules
-use ntools_support::f;
+use ntools_utils::f;
 
 // internal modules
 use crate::vtk::builder::WeightsToVtkBuilder;

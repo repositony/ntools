@@ -59,29 +59,29 @@
 //! **Run-on numbers without whitespace are handled**
 //!
 //! > For example, `1.00E+00-2.00E+00` is recognised and parsed as
-//! `1.00E+00 -2.00E+00` instead.
+//! > `1.00E+00 -2.00E+00` instead.
 //!
 //! **Broken exponential formatting is handled**
 //!
 //! > For example, `1.00+002` is recognised and parsed as `1.00E+002` as though
-//! the missing exponent character is there.
+//! > the missing exponent character is there.
 //!
 //! **Unphysical -ve results are handled**
 //!
 //! > Only an issue for CuV, but it is possible to have -ve flux in the results
-//! for whatever reason. These are considered to be 0.0 in the voxel results.
+//! > for whatever reason. These are considered to be 0.0 in the voxel results.
 //!
 //! **Warnings are given for precision issues**
 //!
 //! > Certainly a problem for Novel 1-Step calculations, but for whatever reason
-//! the MCNP developers decided that the mesh bounds were fine to have 3
-//! significant figures.
+//! > the MCNP developers decided that the mesh bounds were fine to have 3
+//! > significant figures.
 //!
 //! > This means that time and energy bins that are extremely large or close
-//! together are identical and can not be used when searching for groups.
+//! > together are identical and can not be used when searching for groups.
 //!
 //! > It is therefore recommended that groups are found by index whenever this
-//! warning is raised.
+//! > warning is raised.
 //!
 //! # Cell-Under-Voxel (CuV) notes
 //!

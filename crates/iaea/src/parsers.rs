@@ -2,7 +2,7 @@
 
 // internal modules
 use crate::common::{IsomerState, Nuclide};
-use ntools_support::StringExt;
+use ntools_utils::StringExt;
 
 // external crates
 use log::warn;

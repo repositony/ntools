@@ -4,7 +4,7 @@
 use serde::Deserialize;
 
 // ntools modules
-use ntools_support::{f, StringExt};
+use ntools_utils::{f, StringExt};
 
 // internal modules
 use crate::error::{Error, Result};

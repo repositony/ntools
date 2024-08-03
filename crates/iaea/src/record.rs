@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
 use crate::SpecialData;
-use ntools_support::{f, OptionExt};
+use ntools_utils::{f, OptionExt};
 
 /// Type alias for `Vec<Record>`
 pub type RecordSet = Vec<Record>;

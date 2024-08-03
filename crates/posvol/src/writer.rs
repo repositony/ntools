@@ -8,7 +8,7 @@ use std::path::Path;
 // crate modules
 use crate::error::Result;
 use crate::posvol::Posvol;
-use ntools_support::f;
+use ntools_utils::f;
 
 /// Write raw [Posvol] data to an ascii text file
 ///

@@ -1,5 +1,5 @@
 // ntools modules
-use ntools_support::f;
+use ntools_utils::f;
 
 // external crates
 use serde::{Deserialize, Serialize};

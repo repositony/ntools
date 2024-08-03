@@ -1,5 +1,5 @@
 use crate::{Nuclide, SortProperty};
-use ntools_support::f;
+use ntools_utils::f;
 
 use serde::{de::Error, Deserialize, Deserializer, Serialize};
 

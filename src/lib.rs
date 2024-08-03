@@ -7,7 +7,7 @@
 
 // Flatten the default crates
 #[doc(inline)]
-pub use ntools_support::*;
+pub use ntools_utils as utils;
 
 // Re-exports of crates that are behind feature flags
 #[cfg(feature = "fispact")]

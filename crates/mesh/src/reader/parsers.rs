@@ -5,7 +5,7 @@ use crate::reader::{CellData, VoidRecord};
 use crate::voxel::{Group, Voxel};
 
 // ntools modules
-use ntools_support::f;
+use ntools_utils::f;
 
 // external crates
 use log::warn;

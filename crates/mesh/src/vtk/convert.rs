@@ -3,7 +3,7 @@ use std::ops::RangeInclusive;
 
 // ntools modules
 use crate::{Geometry, Group, Mesh};
-use ntools_support::f;
+use ntools_utils::f;
 
 // internal modules
 use crate::vtk::MeshToVtkBuilder;

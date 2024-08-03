@@ -4,7 +4,7 @@
 use crate::error::Error;
 
 // ntools modules
-use ntools_support::f;
+use ntools_utils::f;
 
 /// Complete collection of MCNP particle variants
 ///

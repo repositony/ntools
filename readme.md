@@ -45,10 +45,10 @@ common fusion neutronics tasks and analysis.
 | Crate | Description |
 | ----- | ----------- |
 | [fispact](https://repositony.github.io/ntools/ntools/fispact/index.html) | Analysis tools for FISPACT-II inventory calculations  |
-| [support](https://repositony.github.io/ntools/ntools/support/index.html)   | Common utilities and extension traits     |
 | [iaea](https://repositony.github.io/ntools/ntools/iaea/index.html)       | Module for interacting with the IAEA decay data API   |
 | [mesh](https://repositony.github.io/ntools/ntools/mesh/index.html)       | MCNP mesh tally operations and file parsing           |
 | [posvol](https://repositony.github.io/ntools/ntools/posvol/index.html)   | Se/deserialiser for UKAEA CuV posvol binaries         |
+| [utils](https://repositony.github.io/ntools/ntools/utils/index.html)   | Common utilities and extension traits     |
 | [weights](https://repositony.github.io/ntools/ntools/weights/index.html) | Tools for MCNP weight window operations               |
 | [wwgen](https://repositony.github.io/ntools/ntools/wwgen/index.html)     | Weight window generation methods for MCNP             |
 
@@ -69,8 +69,8 @@ The `ntools` crates are included as dependencies through feature flags. Specify
 ntools = { git = "https://github.com/repositony/ntools.git", features = ["full"] }
 ```
 
-However, it is strongly recommended that users are selective to avoid compiling
-unnecessary dependencies.
+It is recommended that users are more selective to avoid compiling unnecessary
+dependencies.
 
 For example, if only the `fispact` and `iaea` crates are needed:
 

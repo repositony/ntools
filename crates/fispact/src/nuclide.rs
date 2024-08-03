@@ -1,4 +1,4 @@
-use ntools_support::{f, StringExt};
+use ntools_utils::{f, StringExt};
 use serde::{Deserialize, Serialize};
 
 /// Basic satbility variants
