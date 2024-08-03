@@ -12,10 +12,10 @@ rust-version.workspace = true
 version.workspace      = true
 
 [dependencies]
-log            = { workspace = true }
-ntools-support = { workspace = true }
-thiserror      = { workspace = true }
-vtkio          = { workspace = true }
+log          = { workspace = true }
+ntools-utils = { workspace = true }
+thiserror    = { workspace = true }
+vtkio        = { workspace = true }
 
 [lib]
 doctest = true

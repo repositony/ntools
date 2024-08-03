@@ -15,7 +15,7 @@ version.workspace      = true
 itertools      = { workspace = true }
 log            = { workspace = true }
 ntools-mesh    = { workspace = true }
-ntools-support = { workspace = true }
+ntools-utils   = { workspace = true }
 ntools-weights = { workspace = true }
 thiserror      = { workspace = true }
 

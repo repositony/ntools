@@ -5,7 +5,7 @@ homepage     = "https://repositony.github.io/ntools/"
 license      = "GPL-3.0 license"
 repository   = "https://github.com/repositony/ntools"
 rust-version = "1.77"
-version      = "0.3.7"
+version      = "0.4.0"
 
 [package]
 authors.workspace      = true
@@ -26,7 +26,7 @@ members = [
     "crates/iaea",
     "crates/mesh",
     "crates/posvol",
-    "crates/support",
+    "crates/utils",
     "crates/weights",
     "crates/wwgen",
 ]
@@ -36,7 +36,7 @@ ntools-fispact = { optional = true, workspace = true }
 ntools-iaea    = { optional = true, workspace = true }
 ntools-mesh    = { optional = true, workspace = true }
 ntools-posvol  = { optional = true, workspace = true }
-ntools-support = { workspace = true }
+ntools-utils   = { workspace = true }
 ntools-weights = { optional = true, workspace = true }
 ntools-wwgen   = { optional = true, workspace = true }
 
@@ -65,7 +65,7 @@ ntools-iaea    = { version = "*", path = "crates/iaea" }
 ntools-mctal   = { version = "*", path = "crates/mctal" }
 ntools-mesh    = { version = "*", path = "crates/mesh" }
 ntools-posvol  = { version = "*", path = "crates/posvol" }
-ntools-support = { version = "*", path = "crates/support" }
+ntools-utils   = { version = "*", path = "crates/utils" }
 ntools-weights = { version = "*", path = "crates/weights" }
 ntools-wwgen   = { version = "*", path = "crates/wwgen" }
 
