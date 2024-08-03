@@ -216,6 +216,49 @@ impl WeightWindow {
         s += &self.block_3();
         s
     }
+
+    /// Find the (e,t,i,j,k) indicies for a given cell index
+    pub fn cell_index_to_etijk(&self, idx: usize) -> (usize, usize, usize, usize, usize) {
+        // convenient values for readability
+        let a: usize = self.nt * self.ncz * self.ncy * self.ncx;
+        let b: usize = self.ncz * self.ncy * self.ncx;
+        let c: usize = self.ncx * self.ncy;
+        let d: usize = self.ncx;
+
+        // find indicies in reverse (integer division floors in Rust)
+        let e: usize = idx / a;
+        let t: usize = (idx - e * a) / b;
+        let k: usize = (idx - e * a - t * b) / c;
+        let j: usize = (idx - e * a - t * b - k * c) / d;
+        let i: usize = idx - e * a - t * b - k * c - j * d;
+
+        (e, t, i, j, k)
+    }
+
+    /// Convert indexed bins to a voxel index
+    pub fn etijk_to_voxel_index(
+        &self,
+        e_idx: usize,
+        t_idx: usize,
+        i_idx: usize,
+        j_idx: usize,
+        k_idx: usize,
+    ) -> usize {
+        let mut idx: usize = e_idx * (self.nt * self.ncx * self.ncy * self.ncz);
+        idx += t_idx * (self.ncx * self.ncy * self.ncz);
+        idx += i_idx * (self.ncy * self.ncz);
+        idx += j_idx * (self.ncz);
+        idx += k_idx;
+        idx
+    }
+
+    /// Convert from a cell index to a voxel index
+    ///
+    /// Generally useful for weight windows to vtk plotting orders.
+    pub fn cell_index_to_voxel_index(&self, idx: usize) -> usize {
+        let (e, t, i, j, k) = self.cell_index_to_etijk(idx);
+        self.etijk_to_voxel_index(e, t, i, j, k)
+    }
 }
 
 impl WeightWindow {
