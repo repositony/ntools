@@ -337,7 +337,7 @@ impl MeshToVtk {
                     .unzip();
 
                 let cell_data = DataArray {
-                    name: self.group_name(mesh, *e_idx, *t_idx),
+                    name: self.group_name_visit(mesh, *e_idx, *t_idx),
                     elem: ElementType::Scalars {
                         num_comp: 1,
                         lookup_table: None,
@@ -349,7 +349,7 @@ impl MeshToVtk {
                 // do the same for the errors if they are to be included
                 if self.include_errors {
                     let cell_data = DataArray {
-                        name: self.group_name(mesh, *e_idx, *t_idx) + ", error",
+                        name: self.group_name_visit(mesh, *e_idx, *t_idx) + ", error",
                         elem: ElementType::Scalars {
                             num_comp: 1,
                             lookup_table: None,
