@@ -11,9 +11,9 @@
 
 **A modular toolkit of fast and reliable libraries for neutronics analysis**
 
-The full library documentation published [here](https://repositony.github.io/ntools/index.html)
+The full library documentation is published [here](https://repositony.github.io/ntools/index.html)
 
-*This is a pre-release version for testing and development, with the API subject to change until a stable 1.0 release. The core structure and libraries are written but it is a matter of finding time to extend all the high-level features and functionality*
+*This is a pre-release version for testing and development, with the API subject to change until a stable 1.0 release.*
 
 ## Command line tools
 
@@ -28,11 +28,13 @@ Un-linked tools will be made public when I have time to clean them up.
 | [splitmesh](https://github.com/repositony/splitmesh) | Split meshtal tallies into individual files             |
 | [posvol](https://github.com/repositony/posvol)       | Inspect and convert binary UKAEA CuV posvol files       |
 | [mesh2ww](https://github.com/repositony/mesh2ww)     | Convert any meshtal tally to a mesh-based global weight windows |
-| `decaydata` | CLI for all decays data information from the IAEA chart of nuclides |
-| `fisdef`    | Generate source cards of any decay type from FISPACT-II inventories |
-| `fisjson`   | General convenience tools for quickly assessing FISPACT-II inventories |
-| `bude`   | Build-up Density Extrapolation (BUDE) mesh generation |
-| `pointextract` | Extract voxel results for any point(s) in a mesh |
+| `decaydata`   | CLI for all decay data information from the IAEA chart of nuclides |
+| `fisdef`      | Generate source cards of any decay type from FISPACT-II inventories |
+| `fisjson`     | General convenience tools for quickly assessing FISPACT-II inventories |
+| `bude`        | Build-up Density Extrapolation (BUDE) mesh generation |
+| `pointextract`| Extract voxel results for any point(s) in a mesh |
+| `meshop`      | Operations for mesh results (+, -, *, /, ^, etc...) |
+| `mctal`       | Extract and convert MCTAL tally data |
 
 All tools are fully documented with detailed `--help` messages, including
 examples for common use cases.
