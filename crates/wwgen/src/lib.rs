@@ -23,10 +23,10 @@
 //! below 10% to analogue:
 //!
 //! ```rust, no_run
-//! # use ntools_mesh::read_meshtal_target;
+//! # use ntools_mesh::read_target;
 //! # use ntools_wwgen::mesh_to_ww;
 //! // Read tally 104 from a meshtal file
-//! let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+//! let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
 //! // Convert the mesh into a weight window set
 //! let weight_window = mesh_to_ww(&mesh, 0.7, 0.10, false);
 //! ```
@@ -50,10 +50,10 @@
 //! a mesh with 3 energy groups:
 //!
 //! ```rust, no_run
-//! # use ntools_mesh::read_meshtal_target;
+//! # use ntools_mesh::read_target;
 //! # use ntools_wwgen::mesh_to_ww_advanced;
 //! // Read tally 104 from a meshtal file
-//! let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+//! let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
 //! // Convert the mesh into a set of weight windows, using different parameters per set
 //! let ww = mesh_to_ww_advanced(&mesh,
 //!                              &[0.7, 0.5, 0.85],
