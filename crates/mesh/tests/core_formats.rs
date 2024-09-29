@@ -1,16 +1,16 @@
 //! Integration tests for core output types
 
-use ntools_mesh::{read_meshtal_target, Mesh};
+use ntools_mesh::{read_target, Mesh};
 use rstest::{fixture, rstest};
 
 #[fixture]
 fn ref_single() -> Mesh {
-    read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap()
+    read_target("./data/meshes/fmesh_104.msht", 104).unwrap()
 }
 
 #[fixture]
 fn ref_multi() -> Mesh {
-    read_meshtal_target("./data/meshes/fmesh_114.msht", 114).unwrap()
+    read_target("./data/meshes/fmesh_114.msht", 114).unwrap()
 }
 
 #[rstest]
@@ -24,7 +24,7 @@ fn ref_multi() -> Mesh {
 #[case("./data/meshes/fmesh_504.msht", 504)] // case 8
 #[case("./data/meshes/fmesh_524.msht", 524)] // case 9
 fn parse_meshtal_simple(ref_single: Mesh, #[case] path: &str, #[case] id: u32) {
-    let test = read_meshtal_target(path, id).unwrap();
+    let test = read_target(path, id).unwrap();
     for (a, b) in ref_single.voxels.iter().zip(test.voxels.iter()) {
         assert_eq!(a.result, b.result);
         assert_eq!(a.error, b.error);
@@ -42,7 +42,7 @@ fn parse_meshtal_simple(ref_single: Mesh, #[case] path: &str, #[case] id: u32) {
 #[case("./data/meshes/fmesh_514.msht", 514)] // case 8
 #[case("./data/meshes/fmesh_534.msht", 534)] // case 9
 fn parse_meshtal_multigroup(ref_multi: Mesh, #[case] path: &str, #[case] id: u32) {
-    let test = read_meshtal_target(path, id).unwrap();
+    let test = read_target(path, id).unwrap();
     for (a, b) in ref_multi.voxels.iter().zip(test.voxels.iter()) {
         assert_eq!(a.result, b.result);
         assert_eq!(a.error, b.error);

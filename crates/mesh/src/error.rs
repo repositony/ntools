@@ -1,52 +1,82 @@
 //! Result and Error types for ntools-meshtal
 
+use derive_more::From;
+
+use crate::format::Format;
+use crate::point::Point;
+
 /// Type alias for Result<T, mesh::Error>
 pub(crate) type Result<T> = core::result::Result<T, Error>;
 
-/// The error type for the `ntools-mesh` crate
-#[derive(thiserror::Error, Debug)]
+#[derive(Debug, From)]
 pub enum Error {
-    #[error("failed input/output stream")]
-    IOError(#[from] std::io::Error),
+    /// Errors from std::io
+    #[from]
+    Io(std::io::Error),
 
-    #[error("vtkio error")]
-    VtkioError(#[from] vtkio::Error),
+    /// Errors from the vtkio crate
+    #[from]
+    Vtkio(vtkio::Error),
 
-    #[error("failed to infer particle from \"{0}\"")]
-    FailedToInferParticle(String),
+    /// Errors from ntools utilities
+    #[from]
+    NtoolsUtils(ntools_utils::Error),
 
-    #[error("parser failed")]
-    ParseError(String),
+    /// Unable to create a `target` type from `input`
+    FailedToParseType { target: String, input: String },
 
-    #[error("format of mesh {0} is unknown")]
-    UnknownMeshFormat(u32),
+    /// Unable to detect the mesh type from the contect of a file
+    UnknownMeshFormat { mesh_id: u32, format: Format },
 
-    #[error(
-        "inconsistent number of voxels in mesh {id:?} (expected {expected:?}, found {found:?})"
-    )]
+    /// The tally <mesh_id> could not be found in a file
+    TallyNotFound { mesh_id: u32 },
+
+    /// Unable to find a point within the mesh
+    PointNotFound { point: Point },
+
+    /// Empty collection: i.e. vector, array, slice, etc... of len()==0
+    EmptyCollection,
+
+    /// Index outside an acceptable index range
+    IndexOutOfBounds {
+        minimum: usize,
+        maximum: usize,
+        actual: usize,
+    },
+
+    /// Collection length does not match the expectation
+    UnexpectedLength { expected: usize, found: usize },
+
+    /// The number of voxels in a [Mesh](crate::mesh::Mesh) does not match the expectation
     UnexpectedNumberOfVoxels {
         id: u32,
         expected: usize,
         found: usize,
     },
 
-    #[error(
-        "inconsistent length material cells per voxel array (expected {expected:?}, found {found:?})"
-    )]
-    UnexpectedMcpvLength { expected: usize, found: usize },
+    /// Clearer parser errors with better context
+    FailedParse { reason: String, context: String },
 
-    #[error("failed to infer geometry from \"{0}\"")]
-    FailedToInferGeometry(String),
+    /// Raw nom crate errors
+    Nom(String),
+}
 
-    #[error("failed to infer group from \"{0}\"")]
-    FailedToInferGroup(String),
+// Boilerplate for the library. Anyone using the library is a developer and
+// will only care about the debug form anyway. Applications should convert the
+// errors to something with more readable, high-level context for the user.
+impl core::fmt::Display for Error {
+    fn fmt(&self, fmt: &mut core::fmt::Formatter) -> core::result::Result<(), core::fmt::Error> {
+        write!(fmt, "{self:?}")
+    }
+}
 
-    #[error("tally \"{0}\" not found")]
-    TallyNotFound(u32),
+impl std::error::Error for Error {}
 
-    #[error("failed to infer void_off status from \"{0}\"")]
-    FailedToInferVoidoff(String),
-
-    #[error("failure in mesh operations")]
-    MeshError(String),
+// todo: dumb hack for lazy mapping of nom error types for now
+// this should really implement nom::error::ParseError<&str> and
+// nom::error::ContextError<&str> for Error really
+impl From<nom::Err<nom::error::Error<&str>>> for Error {
+    fn from(err: nom::Err<nom::error::Error<&str>>) -> Self {
+        Self::Nom(format!("{err:?}"))
+    }
 }

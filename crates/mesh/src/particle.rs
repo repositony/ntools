@@ -237,7 +237,10 @@ impl TryFrom<u8> for Particle {
             35 => Ok(Self::NegPion),
             36 => Ok(Self::NegKaon),
             37 => Ok(Self::HeavyIon),
-            _ => Err(Error::FailedToInferParticle(f!("{v}"))),
+            _ => Err(Error::FailedToParseType {
+                target: "Particle".into(),
+                input: f!("{v}"),
+            }),
         }
     }
 }
@@ -292,7 +295,10 @@ impl TryFrom<&str> for Particle {
             "35" | "*" | "pi_minus" | "negative pion" => Ok(Self::NegPion),
             "36" | "?" | "k_minus" | "negative kaon" => Ok(Self::NegKaon),
             "37" | "#" | "heavyion" | "heavy ions" => Ok(Self::HeavyIon),
-            _ => Err(Error::FailedToInferParticle(s)),
+            _ => Err(Error::FailedToParseType {
+                target: "Particle".into(),
+                input: s,
+            }),
         }
     }
 }

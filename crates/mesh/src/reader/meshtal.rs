@@ -1,9 +1,12 @@
 // crate modules
 use crate::error::{Error, Result};
-use crate::mesh::{Format, Geometry, Mesh};
+use crate::format::Format;
+use crate::geometry::Geometry;
+use crate::group::Group;
+use crate::mesh::Mesh;
 use crate::particle::Particle;
 use crate::reader::parsers;
-use crate::voxel::{Group, Voxel};
+use crate::voxel::Voxel;
 
 // ntools modules
 use ntools_utils::f;
@@ -161,8 +164,10 @@ impl MeshtalReader {
             if parsers::is_new_mesh(line) {
                 is_format_found = false;
                 is_geometry_found = false;
-                (_, id) = parsers::mesh_id(line)
-                    .map_err(|_| Error::ParseError(f!("Could not find mesh id from {line}")))?;
+                (_, id) = parsers::mesh_id(line).map_err(|_| Error::FailedParse {
+                    reason: "Could not find a mesh id number".into(),
+                    context: line.into(),
+                })?;
                 continue;
             }
 
@@ -206,7 +211,7 @@ impl MeshtalReader {
                 if format_map.contains_key(&id) {
                     Ok(())
                 } else {
-                    Err(Error::TallyNotFound(id))
+                    Err(Error::TallyNotFound { mesh_id: id })
                 }
             }
         }
@@ -263,7 +268,10 @@ impl MeshtalReader {
         match line.chars().next().unwrap() {
             'R' => Ok(Geometry::Cylindrical),
             'X' => Ok(Geometry::Rectangular),
-            _ => Err(Error::FailedToInferGeometry(line.to_string())),
+            _ => Err(Error::FailedToParseType {
+                target: "Geometry".into(),
+                input: line.into(),
+            }),
         }
     }
 
@@ -276,14 +284,21 @@ impl MeshtalReader {
 
     /// Parse the cylinder origin/axis/vec onto coordinate arrays
     fn origin_axs_vec(mesh: &mut Mesh, line: &str) -> Result<()> {
-        let (i, origin) = parsers::origin(line)
-            .map_err(|_| Error::ParseError(f!("Could not find ORIGIN from {line}")))?;
+        // todo this should all be handled inside the parser anyway
+        let (i, origin) = parsers::origin(line).map_err(|_| Error::FailedParse {
+            reason: "Could not parse ORIGIN coordinates".into(),
+            context: line.into(),
+        })?;
 
-        let (i, axis) = parsers::axis(i)
-            .map_err(|_| Error::ParseError(f!("Could not find AXS from {line}")))?;
+        let (i, axis) = parsers::axis(i).map_err(|_| Error::FailedParse {
+            reason: "Could not parse AXS coordinates".into(),
+            context: i.into(),
+        })?;
 
-        let (_, vec) =
-            parsers::vec(i).map_err(|_| Error::ParseError(f!("Could not find VEC from {line}")))?;
+        let (_, vec) = parsers::vec(i).map_err(|_| Error::FailedParse {
+            reason: "Could not parse VEC coordinates".into(),
+            context: i.into(),
+        })?;
 
         mesh.origin = origin;
         mesh.axs = axis;
@@ -294,8 +309,14 @@ impl MeshtalReader {
 
     /// Parse ijk bounds to f64 lists
     fn geometry_bounds(mesh: &mut Mesh, line: &str) -> Result<()> {
-        let (_, values) = parsers::geometry_bounds(line)
-            .map_err(|_| Error::ParseError(f!("Could not extract values from {}", &line[0..20])))?;
+        let (_, values) = parsers::geometry_bounds(line).map_err(|_| Error::FailedParse {
+            reason: "Could not parse geometry bounds".into(),
+            context: if line.len() > 20 {
+                f!("{}...", &line[0..20])
+            } else {
+                line.into()
+            },
+        })?;
         let n_bins: usize = values.len() - 1;
 
         // assign to the relevant mesh fields
@@ -322,7 +343,12 @@ impl MeshtalReader {
                     mesh.jints = n_bins;
                 }
             },
-            _ => return Err(Error::FailedToInferGeometry(f!("{}...", &line[0..20]))),
+            _ => {
+                return Err(Error::FailedToParseType {
+                    target: "Geometry".into(),
+                    input: f!("{}...", &line[0..20]),
+                });
+            }
         }
 
         Ok(())
@@ -330,8 +356,14 @@ impl MeshtalReader {
 
     /// Parse energy/times to Group lists
     fn group_bounds(mesh: &mut Mesh, line: &str) -> Result<()> {
-        let (_, values) = parsers::group_bounds(line)
-            .map_err(|_| Error::ParseError(f!("Could not extract values from {}", &line[0..20])))?;
+        let (_, values) = parsers::group_bounds(line).map_err(|_| Error::FailedParse {
+            reason: "Could not parse group bounds".into(),
+            context: if line.len() > 20 {
+                f!("{}...", &line[0..20])
+            } else {
+                line.into()
+            },
+        })?;
 
         if line.starts_with("Energy") {
             mesh.emesh = values;
@@ -340,7 +372,10 @@ impl MeshtalReader {
             mesh.tmesh = values;
             mesh.tints = mesh.tmesh.len() - 1;
         } else {
-            return Err(Error::FailedToInferGroup(f!("{}...", &line[0..20])));
+            return Err(Error::FailedToParseType {
+                target: "Group".into(),
+                input: f!("{}...", &line[0..20]),
+            });
         }
 
         Ok(())
@@ -451,7 +486,10 @@ impl MeshtalReader {
             if mesh.format == Format::NONE {
                 mesh.format = format
                     .get(&mesh.id)
-                    .ok_or(Error::UnknownMeshFormat(mesh.id))?
+                    .ok_or(Error::UnknownMeshFormat {
+                        mesh_id: mesh.id,
+                        format: mesh.format,
+                    })?
                     .0;
 
                 mesh.geometry = format.get(&mesh.id).unwrap().1; // .1 for Geometry
@@ -462,7 +500,12 @@ impl MeshtalReader {
                 Format::COL | Format::CF => self.parse_column(line, &column_hints)?,
                 Format::IJ | Format::IK | Format::JK => self.parse_matrix(line, &matrix_hints)?,
                 Format::CUV => self.parse_cuv(line, &cuv_hints)?,
-                Format::NONE => return Err(Error::UnknownMeshFormat(mesh.id)),
+                Format::NONE => {
+                    return Err(Error::UnknownMeshFormat {
+                        mesh_id: mesh.id,
+                        format: mesh.format,
+                    })
+                }
             }
         }
 
@@ -696,7 +739,10 @@ impl MeshtalReader {
             self.update_current_time();
             Ok(())
         } else {
-            Err(Error::FailedToInferGroup(line.to_string()))
+            Err(Error::FailedToParseType {
+                target: "Group".into(),
+                input: f!("{}...", &line[0..20]),
+            })
         }
     }
 
@@ -765,8 +811,15 @@ impl MeshtalReader {
 
     /// Parse voidoff status into an explicit enum variant
     fn voidoff_status(&mut self, line: &str) -> Result<()> {
-        let (_, status) = parsers::void_record_status(line)
-            .map_err(|_| Error::ParseError(f!("Could not find \"on\" or \"off\" in {line}")))?;
+        let (_, status) = parsers::void_record_status(line).map_err(|_| Error::FailedParse {
+            reason: "Could not find \"on\" or \"off\"".into(),
+            context: if line.len() > 20 {
+                f!("{}...", &line[0..20])
+            } else {
+                line.into()
+            },
+        })?;
+
         self.void_record = status;
         Ok(())
     }
@@ -777,9 +830,15 @@ impl MeshtalReader {
             VoidRecord::On => (),
             VoidRecord::Off => {
                 if !parsers::contains_alphabetic(line) {
-                    let (_, mut values) = parsers::vector_of_u32(line).map_err(|_| {
-                        Error::ParseError(f!("Could not extract values from {}", &line[0..20]))
-                    })?;
+                    let (_, mut values) =
+                        parsers::vector_of_u32(line).map_err(|_| Error::FailedParse {
+                            reason: "Could not parse group bounds".into(),
+                            context: if line.len() > 20 {
+                                f!("{}...", &line[0..20])
+                            } else {
+                                line.into()
+                            },
+                        })?;
                     self.mcpv.append(&mut values);
                 }
             }
@@ -874,7 +933,7 @@ impl MeshtalReader {
         if self.void_record == VoidRecord::Off && mesh.voxels.is_empty() {
             // check and make sure the number matches just to be sure
             if mesh.iints * mesh.jints * mesh.kints != self.mcpv.len() {
-                return Err(Error::UnexpectedMcpvLength {
+                return Err(Error::UnexpectedLength {
                     expected: mesh.iints * mesh.jints * mesh.kints,
                     found: self.mcpv.len(),
                 });

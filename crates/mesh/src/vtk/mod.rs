@@ -18,9 +18,9 @@
 //!
 //! ```rust, no_run
 //! # use ntools_mesh::vtk::{mesh_to_vtk, write_vtk, VtkFormat};
-//! # use ntools_mesh::{Mesh, read_meshtal_target};
+//! # use ntools_mesh::{Mesh, read_target};
 //! // Get a mesh
-//! let mesh = read_meshtal_target("path/to/file.msht", 104).unwrap();
+//! let mesh = read_target("path/to/file.msht", 104).unwrap();
 //!
 //! // Convert to VTK with the default configuration
 //! let vtk = mesh_to_vtk(&mesh);
@@ -100,9 +100,9 @@ use crate::mesh::Mesh;
 ///
 /// ```rust, no_run
 /// # use ntools_mesh::vtk::{mesh_to_vtk, write_vtk, VtkFormat};
-/// # use ntools_mesh::{Mesh, read_meshtal_target};
+/// # use ntools_mesh::{Mesh, read_target};
 /// // Get a mesh
-/// let mesh = read_meshtal_target("path/to/file.msht", 104).unwrap();
+/// let mesh = read_target("path/to/file.msht", 104).unwrap();
 ///
 /// // Convert to VTK with the default configuration
 /// let vtk = mesh_to_vtk(&mesh);
@@ -124,10 +124,10 @@ pub fn mesh_to_vtk(mesh: &Mesh) -> Vtk {
 /// in the conversion phase.   
 ///
 /// ```rust, no_run
-/// # use ntools_mesh::{Mesh, read_meshtal_target, mesh_to_vtk, write_vtk};
+/// # use ntools_mesh::{Mesh, read_target, mesh_to_vtk, write_vtk};
 /// # use ntools_mesh::vtk::VtkFormat;
 /// // Get a mesh
-/// let mesh = read_meshtal_target("path/to/file.msht", 104).unwrap();
+/// let mesh = read_target("path/to/file.msht", 104).unwrap();
 ///
 /// // Convert to VTK with the default configuration
 /// let vtk = mesh_to_vtk(&mesh);

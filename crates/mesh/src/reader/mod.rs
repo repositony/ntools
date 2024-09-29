@@ -8,12 +8,12 @@
 //! convenience functions:
 //!
 //! ```rust, no_run
-//! # use ntools_mesh::{read_meshtal, read_meshtal_target, Mesh};
+//! # use ntools_mesh::{read, read_target, Mesh};
 //! // Extract all meshes from a file into a Vec<Mesh>
-//! let mesh_list = read_meshtal("/path/to/meshtal.msht").unwrap();
+//! let mesh_list = read("/path/to/meshtal.msht").unwrap();
 //!
 //! // Extract just one target mesh from a file into a single Mesh
-//! let mesh = read_meshtal_target("/path/to/meshtal.msht", 104).unwrap();
+//! let mesh = read_target("/path/to/meshtal.msht", 104).unwrap();
 //! ```
 //!
 //! Under the hood these initialise the [MeshtalReader]. This is made public for
@@ -35,7 +35,7 @@
 //!
 //! # Implementation overview
 //!
-//! When `read_meshtal()` is called, a [MeshtalReader] is initialised and the
+//! When `read()` is called, a [MeshtalReader] is initialised and the
 //! `parse()` method called on the provided file.
 //!
 //! This proceeds in two stages:
@@ -145,11 +145,11 @@ use std::path::Path;
 ///
 /// Example
 /// ```rust, no_run
-/// # use ntools_mesh::{Mesh, read_meshtal};
+/// # use ntools_mesh::{Mesh, read};
 /// // Read every mesh contained in the file
-/// let mesh_tallies: Vec<Mesh> = read_meshtal("path/to/meshtal.msht").unwrap();
+/// let mesh_tallies: Vec<Mesh> = read("path/to/meshtal.msht").unwrap();
 /// ```
-pub fn read_meshtal<P: AsRef<Path>>(path: P) -> Result<Vec<Mesh>> {
+pub fn read<P: AsRef<Path>>(path: P) -> Result<Vec<Mesh>> {
     let path: &Path = Path::new(path.as_ref());
     let mut reader = MeshtalReader::new();
     reader.disable_progress();
@@ -166,11 +166,11 @@ pub fn read_meshtal<P: AsRef<Path>>(path: P) -> Result<Vec<Mesh>> {
 ///
 /// Example
 /// ```rust, no_run
-/// # use ntools_mesh::{Mesh, read_meshtal_target};
+/// # use ntools_mesh::{Mesh, read_target};
 /// // Read only tally 104 (i.e. FMESH104) from the file
-/// let mesh: Mesh = read_meshtal_target("path/to/meshtal.msht", 104).unwrap();
+/// let mesh: Mesh = read_target("path/to/meshtal.msht", 104).unwrap();
 /// ```
-pub fn read_meshtal_target<P: AsRef<Path>>(path: P, target: u32) -> Result<Mesh> {
+pub fn read_target<P: AsRef<Path>>(path: P, target: u32) -> Result<Mesh> {
     let path: &Path = Path::new(path.as_ref());
     let mut reader = MeshtalReader::new();
     reader.disable_progress();

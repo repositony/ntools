@@ -12,6 +12,7 @@ rust-version.workspace = true
 version.workspace      = true
 
 [dependencies]
+derive_more  = { version = "1.0.0", features = ["from"] }
 kdam         = { features = ["template"], workspace = true }
 log          = { workspace = true }
 nalgebra     = { workspace = true }
@@ -19,11 +20,10 @@ nom          = { workspace = true }
 ntools-utils = { workspace = true }
 serde        = { workspace = true }
 serde_json   = { workspace = true }
-thiserror    = { workspace = true }
 vtkio        = { workspace = true }
 
 [dev-dependencies]
-rstest = "0.21"
+rstest = "0.22"
 
 [lib]
 doctest = true

@@ -2,14 +2,20 @@
 
 // crate modules
 use crate::error::{Error, Result};
+use crate::format::Format;
+use crate::geometry::Geometry;
+use crate::group::Group;
 use crate::particle::Particle;
-use crate::voxel::{Group, Voxel, VoxelCoordinate};
+use crate::point::{BoundaryTreatment, Point, PointKind};
+use crate::voxel::{Voxel, VoxelCoordinate};
 
 // ntools modules
-use ntools_utils::{f, ValueExt};
+use ntools_utils::{f, SliceExt, ValueExt};
 
 // standard library
-use core::fmt;
+use log::warn;
+
+use nalgebra::{Rotation, Vector3};
 
 /// Common data structure representing a mesh tally
 ///
@@ -48,12 +54,12 @@ use core::fmt;
 /// Basic reading of files is very simple, regardless of format.
 ///
 /// ```rust, no_run
-/// # use ntools_mesh::{read_meshtal, read_meshtal_target, Mesh};
+/// # use ntools_mesh::{read, read_target, Mesh};
 /// // Extract all meshes from a file into a Vec<Mesh>
-/// let mesh_list = read_meshtal("/path/to/meshtal.msht").unwrap();
+/// let mesh_list = read("/path/to/meshtal.msht").unwrap();
 ///
 /// // Extract just one target mesh from a file into a single Mesh
-/// let mesh = read_meshtal_target("/path/to/meshtal.msht", 104).unwrap();
+/// let mesh = read_target("/path/to/meshtal.msht", 104).unwrap();
 /// ```
 ///
 /// All the parsing and interpretation are done for you, and the data are in a
@@ -438,15 +444,17 @@ impl Mesh {
     pub fn slice_voxels_by_idx(&self, e_idx: usize, t_idx: usize) -> Result<&[Voxel]> {
         // Just quickly make sure the values given are reasonable
         if e_idx > self.ebins() {
-            return Err(Error::MeshError(f!(
-                "{e_idx} invalid for mesh with {} energy bins",
-                self.ebins()
-            )));
+            return Err(Error::IndexOutOfBounds {
+                minimum: 0,
+                maximum: self.ebins(),
+                actual: e_idx,
+            });
         } else if t_idx > self.tbins() {
-            return Err(Error::MeshError(f!(
-                "{t_idx} invalid for mesh with {} time bins",
-                self.tbins()
-            )));
+            return Err(Error::IndexOutOfBounds {
+                minimum: 0,
+                maximum: self.tbins(),
+                actual: t_idx,
+            });
         };
 
         // slice voxels down to the full energy group
@@ -468,9 +476,9 @@ impl Mesh {
     ///
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh, VoxelCoordinate, Group};
+    /// # use ntools_mesh::{read_target, Mesh, VoxelCoordinate, Group};
     /// // Get some voxel from an example file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_114.msht", 114).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_114.msht", 114).unwrap();
     /// // Calculate the coordinates for the voxel
     /// assert_eq!( mesh.voxel_coordinates(63).unwrap(),
     ///             VoxelCoordinate {
@@ -482,11 +490,11 @@ impl Mesh {
     /// ```
     pub fn voxel_coordinates(&self, index: usize) -> Result<VoxelCoordinate> {
         if index > self.voxels.len() {
-            return Err(Error::MeshError(f!(
-                "Index ({}) larger than total number of voxels in mesh ({})",
-                index,
-                self.voxels.len()
-            )));
+            return Err(Error::IndexOutOfBounds {
+                minimum: 0,
+                maximum: self.voxels.len(),
+                actual: index,
+            });
         }
 
         // get the indicies
@@ -681,9 +689,9 @@ impl Mesh {
     /// or any other failing case explicitly use [Mesh::try_maximum()] instead.
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh};
+    /// # use ntools_mesh::{read_target, Mesh};
     /// // Get a mesh from file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
     ///
     /// // Find the maximum of all voxels
     /// assert_eq!(Mesh::maximum(&mesh.voxels), 2.40000e+01);
@@ -702,9 +710,9 @@ impl Mesh {
     /// [Mesh::maximum()] may be used if 0.0 is an acceptable default.
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh};
+    /// # use ntools_mesh::{read_target, Mesh};
     /// // Get a mesh from file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
     ///
     /// // Passing case of a slice of Voxels
     /// assert!(Mesh::try_maximum(&mesh.voxels).is_ok());
@@ -716,7 +724,7 @@ impl Mesh {
             .as_ref()
             .iter()
             .max_by(|a, b| a.result.partial_cmp(&b.result).unwrap())
-            .ok_or(Error::MeshError("List of voxels is empty".to_string()))?;
+            .ok_or(Error::EmptyCollection)?;
 
         Ok(max_voxel.result)
     }
@@ -727,9 +735,9 @@ impl Mesh {
     /// or any other failing case explicitly use [Mesh::try_minimum()] instead.
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh};
+    /// # use ntools_mesh::{read_target, Mesh};
     /// // Get a mesh from file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
     ///
     /// // Find the maximum of all voxels
     /// assert_eq!(Mesh::minimum(&mesh.voxels), 1.00000e+00);
@@ -748,9 +756,9 @@ impl Mesh {
     /// [Mesh::minimum()] may be used if 0.0 is an acceptable default.
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh};
+    /// # use ntools_mesh::{read_target, Mesh};
     /// // Get a mesh from file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
     ///
     /// // Passing case of a slice of Voxels
     /// assert!(Mesh::try_minimum(&mesh.voxels).is_ok());
@@ -762,7 +770,7 @@ impl Mesh {
             .as_ref()
             .iter()
             .min_by(|a, b| a.result.partial_cmp(&b.result).unwrap())
-            .ok_or(Error::MeshError("List of voxels is empty".to_string()))?;
+            .ok_or(Error::EmptyCollection)?;
 
         Ok(min_voxel.result)
     }
@@ -773,9 +781,9 @@ impl Mesh {
     /// case explicitly use [Mesh::try_average()] instead.
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh};
+    /// # use ntools_mesh::{read_target, Mesh};
     /// // Get a mesh from file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
     ///
     /// // Find the maximum of all voxels
     /// assert_eq!(Mesh::average(&mesh.voxels), 1.25000e+01);
@@ -794,9 +802,9 @@ impl Mesh {
     /// [Mesh::average()] may be used if 0.0 is an acceptable default.
     ///
     /// ```rust
-    /// # use ntools_mesh::{read_meshtal_target, Mesh};
+    /// # use ntools_mesh::{read_target, Mesh};
     /// // Get a mesh from file
-    /// let mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+    /// let mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
     ///
     /// // Find the maximum of all voxels
     /// assert!(Mesh::try_average(&mesh.voxels).is_ok());
@@ -805,7 +813,7 @@ impl Mesh {
     /// ```
     pub fn try_average<V: AsRef<[Voxel]>>(voxels: V) -> Result<f64> {
         if voxels.as_ref().is_empty() {
-            Err(Error::MeshError("Cannot average empty list".to_string()))
+            Err(Error::EmptyCollection)
         } else {
             let total: f64 = voxels.as_ref().iter().map(|s| s.result).sum();
             Ok(total / voxels.as_ref().len() as f64)
@@ -840,155 +848,20 @@ impl Mesh {
 
 // Voxel indexing, filters, and useful searches
 impl Mesh {
-    /// Find index bin containing 'value', where bins are low < value <= high
-    ///
-    /// A value on a bin edge returns the bin below. Values equal to the lowest
-    /// bound are considered part of the first bin.
-    ///
-    /// # Example
-    /// ```text
-    ///     MCNP   : emesh = 0.1 1.0 20.0
-    ///     Meshtal: 0.00E+00 1.00E-01 1.00E+00 2.00E+01
-    /// ```
-    ///
-    /// view of the requested energy groups
-    /// ```text
-    ///     0.0 <= bin 0 <= 0.1
-    ///     0.1 < bin 1 <= 1.0
-    ///     1.0 < bin 2 <= 20.0
-    /// ```
-    ///
-    /// ```rust
-    /// # use ntools_mesh::Mesh;
-    /// let bin_edges = vec![0.0, 0.1, 1.0, 20.0];
-    /// // Find values in the array
-    /// assert_eq!(Mesh::find_bin_inclusive(0.0, &bin_edges).unwrap(), 0);
-    /// assert_eq!(Mesh::find_bin_inclusive(0.5, &bin_edges).unwrap(), 1);
-    /// assert_eq!(Mesh::find_bin_inclusive(1.0, &bin_edges).unwrap(), 1);
-    /// assert_eq!(Mesh::find_bin_inclusive(20.0, &bin_edges).unwrap(), 2);
-    /// // Values outside the bin bounds are an error case
-    /// assert!(Mesh::find_bin_inclusive(-1.0, &bin_edges).is_err());
-    /// assert!(Mesh::find_bin_inclusive(21.0, &bin_edges).is_err());
-    /// ```
-    pub fn find_bin_inclusive(value: f64, bin_edges: &[f64]) -> Result<usize> {
-        // make sure there are bin edges to check against
-        if bin_edges.is_empty() {
-            return Err(Error::MeshError("Bin edges array is empty".to_string()));
-        }
-
-        // should be fine to unwrap as not empty
-        let lower_bound = bin_edges.first().unwrap();
-        let upper_bound = bin_edges.last().unwrap();
-
-        // is the value relevant?
-        if &value < lower_bound || &value > upper_bound {
-            return Err(Error::MeshError(f!("Value {value:?} outside of bin edges")));
-        }
-
-        // special case for being on the lowest edge
-        if &value == lower_bound {
-            return Ok(0);
-        }
-
-        let (_, lower_edges) = bin_edges.split_last().unwrap();
-        let (_, upper_edges) = bin_edges.split_first().unwrap();
-
-        // try to find the bin index, range INCLUSIVE of upper edge
-        for (idx, (low, high)) in lower_edges.iter().zip(upper_edges.iter()).enumerate() {
-            // println!("     is {} < {} <= {}")
-            if low < &value && &value <= high {
-                return Ok(idx);
-            }
-        }
-
-        Err(Error::MeshError(f!(
-            "Value {value} was not found in bin edges"
-        )))
-    }
-
-    /// Find index bin containing 'value', where bins are low <= value < high
-    ///
-    /// A value on a bin edge returns the bin above. Values equal to the highest
-    /// bound are considered part of the last bin.
-    ///
-    /// This mirrors the actual MCNP binning behaviour. `EMESH` card entries are
-    /// upper edges, so in general values on a boundary will be recorded in the
-    /// bin above. A special case is made for energies exactly on the last upper
-    /// edge, since this is actually included in the tallied results.
-    ///
-    ///  # Example
-    /// ```text
-    ///     MCNP card : EMESH = 0.1 1.0 20.0
-    ///     Mesh.emesh: 0.00E+00 1.00E-01 1.00E+00 2.00E+01
-    /// ```
-    ///
-    /// MCNP view of these bins:
-    /// ```text
-    ///     0.0 <= bin 0 < 0.1
-    ///     0.1 <= bin 1 < 1.0
-    ///     1.0 <= bin 2 <= 20.0
-    /// ```
-    ///
-    /// ```rust
-    /// # use ntools_mesh::Mesh;
-    /// let bin_edges = vec![0.0, 0.1, 1.0, 20.0];
-    /// // Find values in the array
-    /// assert_eq!(Mesh::find_bin_exclusive(0.0, &bin_edges).unwrap(), 0);
-    /// assert_eq!(Mesh::find_bin_exclusive(0.5, &bin_edges).unwrap(), 1);
-    /// assert_eq!(Mesh::find_bin_exclusive(1.0, &bin_edges).unwrap(), 2);
-    /// assert_eq!(Mesh::find_bin_inclusive(20.0, &bin_edges).unwrap(), 2);
-    /// // Values outside the bin bounds are an error case
-    /// assert!(Mesh::find_bin_exclusive(-1.0, &bin_edges).is_err());
-    /// assert!(Mesh::find_bin_exclusive(21.0, &bin_edges).is_err());
-    /// ```
-    pub fn find_bin_exclusive(value: f64, bin_edges: &[f64]) -> Result<usize> {
-        // make sure there are bin edges to check against
-        if bin_edges.is_empty() {
-            return Err(Error::MeshError("Bin edges array is empty".to_string()));
-        }
-
-        // should be fine to unwrap as not empty
-        let lower_bound = bin_edges.first().unwrap();
-        let upper_bound = bin_edges.last().unwrap();
-
-        // is the value relevant?
-        if &value < lower_bound || &value > upper_bound {
-            return Err(Error::MeshError(f!("Value {value:?} outside of bin edges")));
-        }
-
-        // special case for being on the upper edge
-        if &value == upper_bound {
-            return Ok(bin_edges.len() - 1);
-        }
-
-        let (_, lower_edges) = bin_edges.split_last().unwrap();
-        let (_, upper_edges) = bin_edges.split_first().unwrap();
-
-        // try to find the bin index, range EXCLUSIVE of upper edge
-        for (idx, (low, high)) in lower_edges.iter().zip(upper_edges.iter()).enumerate() {
-            if low <= &value && &value < high {
-                return Ok(idx);
-            }
-        }
-        Err(Error::MeshError(f!(
-            "Value {value} was not found in bin edges"
-        )))
-    }
-
     /// For a given energy, find what group the results are under
     ///
     /// Error returned for handling if the energy is outside of the emesh bounds
     /// and should be handled by the caller.
     ///
     /// Important: the group an energy is under is determined by
-    /// [find_bin_inclusive()](Mesh::find_bin_inclusive) rules for MCNP output,
-    /// even though internally it follows the
-    /// [find_bin_exclusive()](Mesh::find_bin_exclusive) rules.
+    /// [find_bin_inclusive()](ntools_utils::SliceExt::find_bin_inclusive) rules
+    /// for MCNP output, even though internally it follows the
+    /// [find_bin_exclusive()](ntools_utils::SliceExt::find_bin_exclusive) rules.
     pub fn find_energy_group(&self, energy: f64) -> Result<Group> {
         if self.ebins() == 1 {
             Ok(Group::Total)
         } else {
-            let idx = Self::find_bin_inclusive(energy, &self.emesh)?;
+            let idx = self.emesh.find_bin_inclusive(energy)?;
             Ok(Group::Value(self.emesh[idx]))
         }
     }
@@ -996,13 +869,13 @@ impl Mesh {
     /// For a given energy group, find the corresponding `emesh` bin index
     ///
     /// Important: the group an energy is under is determined by
-    /// [find_bin_inclusive()](Mesh::find_bin_inclusive) rules for MCNP output,
-    /// even though internally it follows the
-    /// [find_bin_exclusive()](Mesh::find_bin_exclusive) rules.
+    /// [find_bin_inclusive()](ntools_utils::SliceExt::find_bin_inclusive) rules
+    /// for MCNP output, even though internally it follows the
+    /// [find_bin_exclusive()](ntools_utils::SliceExt::find_bin_exclusive) rules.
     pub fn find_energy_group_index(&self, energy_group: Group) -> Result<usize> {
         match energy_group {
             Group::Total => Ok(self.ebins() - 1),
-            Group::Value(energy) => Self::find_bin_inclusive(energy, &self.emesh),
+            Group::Value(energy) => Ok(self.emesh.find_bin_inclusive(energy)?),
         }
     }
 
@@ -1012,15 +885,15 @@ impl Mesh {
     /// and should be handled by the caller.
     ///
     /// Important: the group a time is under is determined by
-    /// [find_bin_inclusive()](Mesh::find_bin_inclusive) rules for MCNP output,
-    /// even though internally it follows the
-    /// [find_bin_exclusive()](Mesh::find_bin_exclusive) rules.
+    /// [find_bin_inclusive()](ntools_utils::SliceExt::find_bin_inclusive) rules
+    /// for MCNP output, even though internally it follows the
+    /// [find_bin_exclusive()](ntools_utils::SliceExt::find_bin_exclusive) rules.
     pub fn find_time_group(&self, time: f64) -> Result<Group> {
         // tmesh can be empty, have just total, or values + total
         if self.tbins() == 1 {
             Ok(Group::Total)
         } else {
-            let idx = Self::find_bin_inclusive(time, &self.tmesh)?;
+            let idx = self.tmesh.find_bin_inclusive(time)?;
             Ok(Group::Value(self.tmesh[idx]))
         }
     }
@@ -1028,13 +901,13 @@ impl Mesh {
     /// For a given time group, find the corresponding `tmesh` bin index
     ///
     /// Important: the group a time is under is determined by
-    /// [find_bin_inclusive()](Mesh::find_bin_inclusive) rules for MCNP output,
-    /// even though internally it follows the
-    /// [find_bin_exclusive()](Mesh::find_bin_exclusive) rules.
+    /// [find_bin_inclusive()](ntools_utils::SliceExt::find_bin_inclusive) rules
+    /// for MCNP output, even though internally it follows the
+    /// [find_bin_exclusive()](ntools_utils::SliceExt::find_bin_exclusive) rules.
     pub fn find_time_group_index(&self, time_group: Group) -> Result<usize> {
         match time_group {
             Group::Total => Ok(self.tbins() - 1),
-            Group::Value(time) => Self::find_bin_inclusive(time, &self.tmesh),
+            Group::Value(time) => Ok(self.tmesh.find_bin_inclusive(time)?),
         }
     }
 
@@ -1060,9 +933,11 @@ impl Mesh {
         if e_idx < self.ebins() {
             Ok(self.energy_groups()[e_idx])
         } else {
-            Err(Error::MeshError(f!(
-                "Index {e_idx} outside range of energy groups"
-            )))
+            Err(Error::IndexOutOfBounds {
+                minimum: 0,
+                maximum: self.ebins(),
+                actual: e_idx,
+            })
         }
     }
 
@@ -1088,9 +963,269 @@ impl Mesh {
         if t_idx < self.tbins() {
             Ok(self.time_groups()[t_idx])
         } else {
-            Err(Error::MeshError(f!(
-                "Index {t_idx} outside range of time groups"
-            )))
+            Err(Error::IndexOutOfBounds {
+                minimum: 0,
+                maximum: self.tbins(),
+                actual: t_idx,
+            })
+        }
+    }
+}
+
+/// Point method implementations for the Mesh type
+impl Mesh {
+    /// Find the result at a [Point]
+    ///
+    /// Results are averaged between adjacent voxels when the point is on a
+    /// boundary. Points outside the mesh return `None`.
+    ///
+    /// A small tolerance is granted for detecting points on boundaries. By
+    /// default this is set to within 0.01% of the voxel length in each axis.
+    ///
+    /// For example, for a voxel spanning 0.0 - 1.0 in the x-axis, a Point with
+    /// x = 0.999 is considered to be on the boundary. The result will therefore
+    /// be the avaerage of this and the appropriate adjacent voxel.
+    pub fn find_point(&self, point: Point, boundary: BoundaryTreatment) -> Option<(f64, f64)> {
+        match self.find_voxels(point, boundary) {
+            Ok(voxels) => {
+                // average the voxels if multiple
+                let result = voxels.iter().map(|v| v.result).sum::<f64>() / (voxels.len() as f64);
+
+                // sum errors in quadrature
+                let relative_error = voxels
+                    .iter()
+                    .map(|v| v.absolute_error().powi(2))
+                    .sum::<f64>()
+                    .sqrt()
+                    / result;
+
+                Some((result, relative_error))
+            }
+            _ => None,
+        }
+    }
+
+    /// Find the results for a list of [Point]s
+    ///
+    /// Equivalent to looping over [find_point()](crate::mesh::Mesh::find_point)
+    /// in a loop for multiple points, collecting the results to a vector.
+    ///
+    /// Results are averaged between adjacent voxels when the point is on a
+    /// boundary. Points outside the mesh return `None`.
+    ///
+    /// See [find_point()](crate::mesh::Mesh::find_point) for details.
+    pub fn find_points(
+        &self,
+        points: &[Point],
+        boundary: BoundaryTreatment,
+    ) -> Vec<Option<(f64, f64)>> {
+        points
+            .iter()
+            .map(|p| self.find_point(p.clone(), boundary))
+            .collect()
+    }
+
+    /// Find all relevant voxels corresponding to a [Point]
+    ///
+    /// Try to find all adjacent voxels that a [Point] touches.
+    ///
+    /// A small tolerance may be granted for detecting points on boundaries. For
+    /// example, `tol=0.01` would consider points to be on a boudary if within
+    /// 1% of the total voxel length for each axis.
+    pub fn find_voxels(&self, point: Point, boundary: BoundaryTreatment) -> Result<Vec<Voxel>> {
+        // convert into the correct geometry
+        let point = self.coerce_point_kind(&point);
+
+        // check if point valid
+        self.is_point_valid(&point)?;
+
+        let e = self.find_energy_group_index(point.e)?;
+        let t = self.find_time_group_index(point.t)?;
+        let mut voxels = Vec::with_capacity(8);
+
+        // at this point we know the point is valid and in the right geometry
+        match point.kind {
+            PointKind::Index => {
+                let index = self.etijk_to_voxel_index(
+                    e,
+                    t,
+                    point.i as usize,
+                    point.j as usize,
+                    point.k as usize,
+                );
+                voxels.push(self.voxels[index])
+            }
+            _ => match boundary {
+                BoundaryTreatment::Average(tol) => {
+                    for i in &self.imesh.find_bin_average(point.i, tol)? {
+                        for j in &self.jmesh.find_bin_average(point.j, tol)? {
+                            for k in &self.kmesh.find_bin_average(point.k, tol)? {
+                                let index = self.etijk_to_voxel_index(e, t, *i, *j, *k);
+                                voxels.push(self.voxels[index])
+                            }
+                        }
+                    }
+                }
+                BoundaryTreatment::Lower => {
+                    let i = &self.imesh.find_bin_exclusive(point.i)?;
+                    let j = &self.jmesh.find_bin_exclusive(point.j)?;
+                    let k = &self.kmesh.find_bin_exclusive(point.k)?;
+                    let index = self.etijk_to_voxel_index(e, t, *i, *j, *k);
+                    voxels.push(self.voxels[index])
+                }
+                BoundaryTreatment::Upper => {
+                    let i = &self.imesh.find_bin_inclusive(point.i)?;
+                    let j = &self.jmesh.find_bin_inclusive(point.j)?;
+                    let k = &self.kmesh.find_bin_inclusive(point.k)?;
+                    let index = self.etijk_to_voxel_index(e, t, *i, *j, *k);
+                    voxels.push(self.voxels[index])
+                }
+            },
+        }
+
+        Ok(voxels)
+    }
+}
+
+// Private point methods
+impl Mesh {
+    /// Checks if [Point] coordinate and groups are all within the mesh bounds
+    ///
+    /// Points exactly on the boundaries are considered within the self. It is
+    /// assumed that the point has the correct coordinate system.
+    fn is_point_valid(&self, point: &Point) -> Result<bool> {
+        if self.is_valid_group(point)? && self.is_valid_coordinate(point)? {
+            Ok(true)
+        } else {
+            Err(Error::PointNotFound {
+                point: point.clone(),
+            })
+        }
+    }
+
+    /// Checks if (i,j,k) coordinate is within the mesh bounds
+    ///
+    /// Points exactly on the boundaries are considered within the self. It is
+    /// assumed that the point has the correct coordinate system.
+    fn is_valid_coordinate(&self, point: &Point) -> Result<bool> {
+        // todo should be in the correct coordinate system, but can add a check
+        Ok(match point.kind {
+            PointKind::Index => {
+                // for ijk only need to check the max
+                (point.i as usize) < self.iints
+                    && (point.j as usize) < self.jints
+                    && (point.k as usize) < self.kints
+            }
+            _ => {
+                // for coordinate types need to check all the mesh boundaries
+                point.i >= self.imesh.try_min()?
+                    && point.i <= self.imesh.try_max()?
+                    && point.j >= self.jmesh.try_min()?
+                    && point.j <= self.jmesh.try_max()?
+                    && point.k >= self.kmesh.try_min()?
+                    && point.k <= self.kmesh.try_max()?
+            }
+        })
+    }
+
+    fn is_valid_group(&self, point: &Point) -> Result<bool> {
+        // Make sure the energy group is valid
+        if let Group::Value(e) = point.e {
+            if e < self.emesh.try_min()? || e > self.emesh.try_max()? {
+                return Ok(false);
+            }
+        }
+
+        // Make sure the energy group is valid
+        if let Group::Value(t) = point.t {
+            if t < self.tmesh.try_min()? || t > self.tmesh.try_max()? {
+                return Ok(false);
+            }
+        }
+
+        // should be good otherwise
+        Ok(true)
+    }
+
+    /// Convert tuple of (r,z,t) to cartesian (x,y,z)
+    fn convert_rzt_to_xyz(&self, r: f64, z: f64, t: f64) -> (f64, f64, f64) {
+        (r * t.cos(), r * t.sin(), z)
+    }
+
+    /// Convert tuple of (x,y,z) to cylindrical (r,z,t)
+    fn convert_xyz_to_rzt(&self, x: f64, y: f64, z: f64) -> (f64, f64, f64) {
+        // invert the translation
+        let mut x = x - self.origin[0];
+        let mut y = y - self.origin[1];
+        let mut z = z - self.origin[2];
+
+        // invert the rotation
+        if let Some(r) = self.rotation_matrix() {
+            let a = r.inverse_transform_vector(&Vector3::from([x, y, z]));
+            x = a[0];
+            y = a[1];
+            z = a[2];
+        };
+
+        // now just point as if in default rotation/origin/axis
+
+        // convert to 0-360 range, TAU = 2*PI
+        let mut t = y.atan2(x);
+        t = if t.is_sign_negative() {
+            std::f64::consts::TAU + t
+        } else {
+            t
+        };
+        (x.hypot(y), z, t)
+    }
+
+    /// Initialise the rotation matrix from AXS if required
+    fn rotation_matrix(&self) -> Option<Rotation<f64, 3>> {
+        // the mcnp default axis
+        let axs_default = [0.0, 0.0, 1.0];
+
+        if axs_default == self.axs {
+            None
+        } else {
+            let axs_default = Vector3::from(axs_default);
+            let axs_user = Vector3::from([self.axs[0], self.axs[1], self.axs[2]]);
+            Some(Rotation::face_towards(&axs_user, &axs_default))
+        }
+    }
+
+    fn coerce_point_kind(&self, point: &Point) -> Point {
+        match point.kind {
+            PointKind::Index => point.clone(),
+            PointKind::Rectangular => match self.geometry {
+                Geometry::Rectangular => point.clone(),
+                Geometry::Cylindrical => {
+                    warn!("Automatic Point conversion to mesh geometry may not be exact");
+                    let (r, z, t) = self.convert_xyz_to_rzt(point.i, point.j, point.k);
+                    Point {
+                        e: point.e,
+                        t: point.t,
+                        i: r,
+                        j: z,
+                        k: t,
+                        kind: PointKind::Cylindrical,
+                    }
+                }
+            },
+            PointKind::Cylindrical => match self.geometry {
+                Geometry::Cylindrical => point.clone(),
+                Geometry::Rectangular => {
+                    warn!("Automatic Point conversion to mesh geometry may not be exact");
+                    let (x, y, z) = self.convert_rzt_to_xyz(point.i, point.j, point.k);
+                    Point {
+                        e: point.e,
+                        t: point.t,
+                        i: x,
+                        j: y,
+                        k: z,
+                        kind: PointKind::Rectangular,
+                    }
+                }
+            },
         }
     }
 }
@@ -1120,8 +1255,8 @@ impl Default for Mesh {
     }
 }
 
-impl fmt::Display for Mesh {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for Mesh {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let head: String = f!(
             " > Mesh {} [{:?}, {:?}]",
             self.id,
@@ -1169,170 +1304,4 @@ impl fmt::Display for Mesh {
         }
         write!(f, "{}", s)
     }
-}
-
-/// Mesh geometry types, i.e. `Rectangular`, `Cylindrical`
-///
-/// Spherical is not currently implemented because everyone asked just questions
-/// their existance in MCNP. This can be implemented if someone needs it.
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum Geometry {
-    /// Cartesian (rec, xyz) mesh type
-    Rectangular = 1,
-    /// Cylindrical (cyl, rzt) mesh type
-    Cylindrical = 2,
-    // todo add spherical mesh type and implement into parsers etc...
-    // Spherical (sph, rpt) mesh type
-    // Spherical = 3
-}
-
-impl Geometry {
-    /// Full name i.e. 'Rectangular', 'Cylindrical'
-    pub fn long_name(&self) -> &str {
-        match self {
-            Geometry::Rectangular => "Rectangular",
-            Geometry::Cylindrical => "Cylindrical",
-        }
-    }
-
-    /// Shortened name i.e. 'Rec', 'Cyl'
-    pub fn short_name(&self) -> &str {
-        match self {
-            Geometry::Rectangular => "Rec",
-            Geometry::Cylindrical => "Cyl",
-        }
-    }
-
-    /// Coordinate system based name i.e. 'XYZ', 'RZT'
-    pub fn geometry_name(&self) -> &str {
-        match self {
-            Geometry::Rectangular => "XYZ",
-            Geometry::Cylindrical => "RZT",
-        }
-    }
-}
-
-impl fmt::Display for Geometry {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.geometry_name())
-    }
-}
-
-/// Meshtal output formats, e.g. `COL`, `JK`, `CUV`...
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Format {
-    /// Column data (MCNP default)
-    ///
-    /// The default MCNPv6.2 output format.
-    ///
-    /// Example:
-    /// ```text
-    ///  Energy      X      Y      Z     Result     Rel Error
-    /// 1.111E+00 -0.500 -0.733 -2.625 7.25325E-03 1.20187E-02
-    /// 1.111E+00 -0.500 -0.733 -0.875 3.43507E-02 4.71983E-03
-    /// etc ...
-    /// ```
-    COL,
-    /// Column data including voxel volume
-    ///
-    /// Same as column, but with extra information on voxel volumes. Since these
-    /// data are derivable, volume information is descarded during parsing.
-    ///
-    /// Example:
-    /// ```text
-    ///  Energy      X      Y      Z     Result     Rel Error     Volume    Rslt * Vol
-    /// 1.111E+00 -0.500 -0.733 -2.625 7.25325E-03 1.20187E-02 1.28333E+00 9.30834E-03
-    /// 1.111E+00 -0.500 -0.733 -0.875 3.43507E-02 4.71983E-03 1.28333E+00 4.40834E-02
-    /// etc ...
-    /// ```
-    CF,
-    /// Cell-under-Voxel column data
-    ///
-    /// The UKAEA Cell under Voxel patch coerces all meshes, regradless of input
-    /// deck specifications, to its own format. Multiple entries can correspond
-    /// to the same voxel and voxels with only void cells can be omitted
-    /// entirely. This is all handled in the background by the parsers.
-    ///
-    /// The cell number, matrial, and volume are parsed but not currently used
-    /// while the main functionality is implemented.
-    ///
-    /// Example:
-    /// ```text
-    ///  Energy   Cell Mat  Density     Volume      X     Y       Z      Result   Rel Error
-    /// 1.000E+35  76  6  8.00000E+00 4.47858E+02 0.697 9.000 -16.000 1.23957E-04 2.97900E-02
-    /// 1.000E+35  84  6  8.00000E+00 5.06160E+00 0.697 9.000 -16.000 2.36108E-04 1.14448E-01
-    /// etc ...
-    /// ```
-    CUV,
-    /// 2D matrix of I (col) and J (row) data, grouped by K
-    ///
-    /// Matrix outputs separated into tables for two dimensions, and grouped by
-    /// the third. For example, the IJ tables for
-    /// [Geomtery::Rectangular](crate::mesh::Geometry) are X by Y, grouped by Z
-    /// bins.
-    ///
-    /// ```text
-    /// Energy Bin: 0.00E+00 - 1.11E+00 MeV
-    /// Time Bin: -1.00E+36 - 0.00E+00 shakes
-    ///   Z bin: -3.50  -  -1.75
-    ///     Tally Results:  X (across) by Y (down)
-    ///                   -0.50        0.50
-    ///         -0.73   0.00000E+00 0.00000E+00
-    ///          0.00   0.00000E+00 0.00000E+00
-    ///          0.73   0.00000E+00 0.00000E+00
-    ///     Relative Errors
-    ///                   -0.50        0.50
-    ///         -0.73   0.00000     0.00000
-    ///          0.00   0.00000     0.00000
-    ///          0.73   0.00000     0.00000
-    /// ```
-    IJ,
-    /// 2D matrix of I (col) and K (row) data, grouped by J
-    ///
-    /// Matrix outputs separated into tables for two dimensions, and grouped by
-    /// the third. For example, the IK tables for
-    /// [Geomtery::Rectangular](crate::mesh::Geometry) are X by Z, grouped by Y
-    /// bins.
-    ///
-    /// ```text
-    /// Energy Bin: 0.00E+00 - 1.11E+00 MeV
-    /// Time Bin: -1.00E+36 - 0.00E+00 shakes
-    ///   Y bin: -3.50  -  -1.75
-    ///     Tally Results:  X (across) by Z (down)
-    ///                   -0.50        0.50
-    ///         -0.73   0.00000E+00 0.00000E+00
-    ///          0.00   0.00000E+00 0.00000E+00
-    ///          0.73   0.00000E+00 0.00000E+00
-    ///     Relative Errors
-    ///                   -0.50        0.50
-    ///         -0.73   0.00000     0.00000
-    ///          0.00   0.00000     0.00000
-    ///          0.73   0.00000     0.00000
-    /// ```
-    IK,
-    /// 2D matrix of J (col) and K (row) data, grouped by I
-    ///
-    /// Matrix outputs separated into tables for two dimensions, and grouped by
-    /// the third. For example, the JK tables for
-    /// [Geomtery::Rectangular](crate::mesh::Geometry) are Z by Y, grouped by X
-    /// bins.
-    ///
-    /// ```text
-    /// Energy Bin: 0.00E+00 - 1.11E+00 MeV
-    /// Time Bin: -1.00E+36 - 0.00E+00 shakes
-    ///   X bin: -3.50  -  -1.75
-    ///     Tally Results:  Y (across) by Z (down)
-    ///                   -0.50        0.50
-    ///         -0.73   0.00000E+00 0.00000E+00
-    ///          0.00   0.00000E+00 0.00000E+00
-    ///          0.73   0.00000E+00 0.00000E+00
-    ///     Relative Errors
-    ///                   -0.50        0.50
-    ///         -0.73   0.00000     0.00000
-    ///          0.00   0.00000     0.00000
-    ///          0.73   0.00000     0.00000
-    /// ```
-    JK,
-    /// Special case for unknown format or meshes with no output
-    NONE,
 }

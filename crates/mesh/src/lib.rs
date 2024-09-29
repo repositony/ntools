@@ -7,12 +7,12 @@
 //! files very simple, regardless of format. For example:
 //!
 //! ```rust, no_run
-//! # use ntools_mesh::{read_meshtal,read_meshtal_target};
+//! # use ntools_mesh::{read,read_target};
 //! // Extract ALL meshes from a file into a Vec<Mesh>
-//! let mesh_list = read_meshtal("/path/to/meshtal.msht").unwrap();
+//! let mesh_list = read("/path/to/meshtal.msht").unwrap();
 //!
 //! // Extract just one target Mesh from a file
-//! let mesh = read_meshtal_target("/path/to/meshtal.msht", 104).unwrap();
+//! let mesh = read_target("/path/to/meshtal.msht", 104).unwrap();
 //! ```
 //!
 //! ## Supported output formats
@@ -53,11 +53,11 @@
 //! Example to read in a mesh tally and perform varius operations.
 //!
 //! ```rust, no_run
-//! # use ntools_mesh::{Mesh,read_meshtal_target,mesh_to_vtk,write_vtk};
+//! # use ntools_mesh::{Mesh,read_target,mesh_to_vtk,write_vtk};
 //! # use ntools_mesh::vtk::{VtkFormat};
 //! fn main() {
 //!     // Read mesh 104 from the meshtal file
-//!     let mut mesh = read_meshtal_target("./data/meshes/fmesh_104.msht", 104).unwrap();
+//!     let mut mesh = read_target("./data/meshes/fmesh_104.msht", 104).unwrap();
 //!
 //!     // print a summary of the mesh (Display trait impemented)
 //!     println!("{mesh}");
@@ -78,8 +78,12 @@
 
 // Split into subfiles for development, but anything important is re-exported
 mod error;
+mod format;
+mod geometry;
+mod group;
 mod mesh;
 mod particle;
+mod point;
 mod voxel;
 
 pub mod reader;
@@ -87,19 +91,31 @@ pub mod vtk;
 
 // inline important the mesh-related modules for a nice public API
 #[doc(inline)]
-pub use reader::{read_meshtal, read_meshtal_target};
+pub use reader::{read, read_target};
 
 #[doc(inline)]
-pub use mesh::{Format, Geometry, Mesh};
+pub use mesh::Mesh;
+
+#[doc(inline)]
+pub use format::Format;
+
+#[doc(inline)]
+pub use geometry::Geometry;
+
+#[doc(inline)]
+pub use group::Group;
 
 #[doc(inline)]
 pub use particle::Particle;
 
 #[doc(inline)]
-pub use voxel::{Group, Voxel, VoxelCoordinate};
+pub use voxel::{Voxel, VoxelCoordinate};
 
 #[doc(inline)]
 pub use vtk::{mesh_to_vtk, write_vtk};
 
 #[doc(inline)]
 pub use error::Error;
+
+#[doc(inline)]
+pub use point::{BoundaryTreatment, Point, PointKind};

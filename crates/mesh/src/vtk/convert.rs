@@ -241,6 +241,7 @@ impl MeshToVtk {
         }
     }
 
+    #[allow(dead_code)]
     /// Create a name to display in the output mesh data
     fn group_name(&self, mesh: &Mesh, e_idx: usize, t_idx: usize) -> String {
         // "Energy[0] 2.00E+01 MeV, Time[0] 1.00E+12 shakes, error"

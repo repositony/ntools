@@ -1,8 +1,9 @@
 //! Library of parser functions
 
 // crate modules
+use crate::group::Group;
 use crate::reader::{CellData, VoidRecord};
-use crate::voxel::{Group, Voxel};
+use crate::voxel::Voxel;
 
 // ntools modules
 use ntools_utils::f;
@@ -195,19 +196,19 @@ pub fn geometry_bounds(i: &str) -> IResult<&str, Vec<f64>> {
 
 /// Parse three numerical values following the `origin at` tag
 pub fn origin(i: &str) -> IResult<&str, [f64; 3]> {
-    let (i, _) = terminated(tag("origin at"), space1)(i)?;
+    let (i, _) = tag("origin at")(i.trim_start())?;
     coordinate_array(i)
 }
 
 /// Parse three numerical values following the `axis in` tag
 pub fn axis(i: &str) -> IResult<&str, [f64; 3]> {
-    let (i, _) = terminated(tag("axis in"), space1)(i)?;
+    let (i, _) = tag("axis in")(i.trim_start())?;
     coordinate_array(i)
 }
 
 /// Parse three numerical values following the `direction, VEC direction` tag
 pub fn vec(i: &str) -> IResult<&str, [f64; 3]> {
-    let (i, _) = terminated(tag("direction, VEC direction"), space1)(i)?;
+    let (i, _) = tag("direction, VEC direction")(i.trim_start())?;
     coordinate_array(i)
 }
 
@@ -379,9 +380,12 @@ pub fn vector_of_u32(i: &str) -> IResult<&str, Vec<u32>> {
 
 /// Parse any three numbers into an array
 fn coordinate_array(i: &str) -> IResult<&str, [f64; 3]> {
-    let (i, a) = terminated(double, space1)(i)?;
-    let (i, b) = terminated(double, space1)(i)?;
-    let (i, c) = terminated(double, space0)(i)?;
+    let (i, a) = double(i.trim_start())?;
+    let (i, b) = double(i.trim_start())?;
+    let (i, c) = double(i.trim_start())?;
+
+    println!("i = {i}\n  -> [a, b, c] = {a} {b} {c}");
+
     Ok((i, [a, b, c]))
 }
 
