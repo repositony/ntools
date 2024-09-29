@@ -23,9 +23,9 @@
 //! For example:
 //!
 //! ```rust, no_run
-//! # use ntools_iaea::{Record, fetch_nuclide, RadType, RecordSet};
+//! # use ntools_iaea::{Record, load_nuclide, RadType, RecordSet};
 //! // Get all records for the Cobalt-60 nuclide
-//! let cobalt60: RecordSet = fetch_nuclide("co60", RadType::Gamma).unwrap();
+//! let cobalt60: RecordSet = load_nuclide("co60", RadType::Gamma).unwrap();
 //!
 //! // Find the 1173 keV emission as an example
 //! let example: &Record = cobalt60
