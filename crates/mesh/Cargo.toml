@@ -23,7 +23,7 @@ serde_json   = { workspace = true }
 vtkio        = { workspace = true }
 
 [dev-dependencies]
-rstest = "0.22"
+rstest = { workspace = true }
 
 [lib]
 doctest = true
