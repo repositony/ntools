@@ -1,0 +1,24 @@
+[package]
+authors.workspace      = true
+description            = "Module for parsing mctal data files"
+edition.workspace      = true
+homepage.workspace     = true
+keywords               = ["mcnp", "mctal", "neutronics", "ntools"]
+license.workspace      = true
+name                   = "ntools-mctal"
+readme                 = "readme.md"
+repository.workspace   = true
+rust-version.workspace = true
+version.workspace      = true
+
+[dependencies]
+derive_more  = { version = "1.0.0", features = ["from"] }
+log          = { workspace = true }
+nom          = { workspace = true }
+ntools-utils = { workspace = true }
+
+[lib]
+doctest = true
+
+[lints]
+workspace = true

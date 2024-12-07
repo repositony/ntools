@@ -25,6 +25,11 @@ pub use ntools_iaea as iaea;
 #[doc(inline)]
 pub use ntools_mesh as mesh;
 
+#[cfg(feature = "mctal")]
+#[cfg_attr(docsrs, doc(cfg(feature = "mctal")))]
+#[doc(inline)]
+pub use ntools_mctal as mctal;
+
 #[cfg(feature = "posvol")]
 #[cfg_attr(docsrs, doc(cfg(feature = "posvol")))]
 #[doc(inline)]
