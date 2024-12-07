@@ -25,12 +25,13 @@ common fusion neutronics tasks and analysis.
 | [fispact](https://repositony.github.io/ntools/ntools/fispact/index.html) | Analysis tools for FISPACT-II inventory calculations  |
 | [iaea](https://repositony.github.io/ntools/ntools/iaea/index.html)       | Module for interacting with the IAEA decay data API   |
 | [mesh](https://repositony.github.io/ntools/ntools/mesh/index.html)       | MCNP mesh tally operations and file parsing           |
+| [mctal](https://repositony.github.io/ntools/ntools/mctal/index.html)     | MCNP MCTAL file parsing and tally data                |
 | [posvol](https://repositony.github.io/ntools/ntools/posvol/index.html)   | Se/deserialiser for UKAEA CuV posvol binaries         |
 | [utils](https://repositony.github.io/ntools/ntools/utils/index.html)     | Common utilities and extension traits                 |
 | [weights](https://repositony.github.io/ntools/ntools/weights/index.html) | Tools for MCNP weight window operations               |
 | [wwgen](https://repositony.github.io/ntools/ntools/wwgen/index.html)     | Weight window generation methods for MCNP             |
 
-[Command line tools](https://github.com/repositony?tab=repositories&q=&type=&language=rust&sort=) 
+[Command line tools](https://github.com/repositony?tab=repositories&q=&type=&language=rust&sort=)
 built on these core libraries are maintained in their own repositories.
 
 ### Modular crates
