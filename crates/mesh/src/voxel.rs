@@ -56,9 +56,32 @@ impl Voxel {
     /// /// 10% relative error => 50.0 +/-5.0
     /// assert_eq!(voxel.absolute_error(), 5.0);
     /// ```
-    ///
     pub fn absolute_error(&self) -> f64 {
-        self.result * self.error
+        (self.result * self.error).abs()
+    }
+
+    /// Returns the relative error for the voxel
+    ///
+    /// The MCNP mesh results are output and stored as the relative
+    /// uncertainty anyway. However, having both
+    /// [absolute_error()](Voxel::absolute_error) and
+    /// [relative_error()](Voxel::relative_error) methods makes intent
+    /// explicit.
+    ///
+    /// For example:
+    ///
+    /// ```rust
+    /// # use ntools_mesh::Voxel;
+    /// let voxel = Voxel {
+    ///     result: 50.0,
+    ///     error: 0.10,
+    ///     ..Default::default()
+    /// };
+    /// /// 10% relative error => 50.0 +/-5.0
+    /// assert_eq!(voxel.relative_error(), 0.1);
+    /// ```
+    pub fn relative_error(&self) -> f64 {
+        self.error.abs()
     }
 
     /// Raise the voxel to some power
@@ -100,21 +123,30 @@ impl std::fmt::Display for Voxel {
 
 impl Add<Self> for Voxel {
     type Output = Self;
-    fn add(self, rhs: Self) -> Self {
-        let result = self.result + rhs.result;
-        let error = (self.absolute_error().powi(2) + rhs.absolute_error().powi(2)).sqrt() / result;
+    fn add(self, other: Self) -> Self {
+        let result = self.result + other.result;
+        let absolute_error =
+            (self.absolute_error().powi(2) + other.absolute_error().powi(2)).sqrt();
+
+        // turn into relative error if appropriate, otherwise follow MCNP
+        // and cap to 1.0 as meaningless
+        let relative_error = if absolute_error > result {
+            1.0
+        } else {
+            absolute_error / result
+        };
 
         Self {
             index: self.index,
             result,
-            error,
+            error: relative_error.abs(),
         }
     }
 }
 
 impl AddAssign<Self> for Voxel {
-    fn add_assign(&mut self, rhs: Self) {
-        *self = *self + rhs;
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other;
     }
 }
 
@@ -123,11 +155,18 @@ where
     T: Into<f64>,
 {
     type Output = Self;
-    fn add(self, rhs: T) -> Self {
+    fn add(self, other: T) -> Self {
+        let result = self.result + other.into();
+        let relative_error = if self.error > result {
+            1.0
+        } else {
+            self.error / result
+        };
+
         Self {
             index: self.index,
-            result: self.result + rhs.into(),
-            error: self.error,
+            result,
+            error: relative_error.abs(),
         }
     }
 }
@@ -136,28 +175,37 @@ impl<T> AddAssign<T> for Voxel
 where
     T: Into<f64>,
 {
-    fn add_assign(&mut self, rhs: T) {
-        *self = *self + rhs.into();
+    fn add_assign(&mut self, other: T) {
+        *self = *self + other.into();
     }
 }
 
 impl Sub<Self> for Voxel {
     type Output = Self;
-    fn sub(self, rhs: Self) -> Self {
-        let result = self.result - rhs.result;
-        let error = (self.absolute_error().powi(2) + rhs.absolute_error().powi(2)).sqrt() / result;
+    fn sub(self, other: Self) -> Self {
+        let result = self.result - other.result;
+        let absolute_error =
+            (self.absolute_error().powi(2) + other.absolute_error().powi(2)).sqrt();
+
+        // turn into relative error if appropriate, otherwise follow MCNP
+        // and cap to 1.0 as meaningless
+        let relative_error = if absolute_error > result {
+            1.0
+        } else {
+            absolute_error / result
+        };
 
         Self {
             index: self.index,
             result,
-            error,
+            error: relative_error.abs(),
         }
     }
 }
 
 impl SubAssign<Self> for Voxel {
-    fn sub_assign(&mut self, rhs: Self) {
-        *self = *self - rhs;
+    fn sub_assign(&mut self, other: Self) {
+        *self = *self - other;
     }
 }
 
@@ -166,11 +214,18 @@ where
     T: Into<f64>,
 {
     type Output = Self;
-    fn sub(self, rhs: T) -> Self {
+    fn sub(self, other: T) -> Self {
+        let result = self.result - other.into();
+        let relative_error = if self.error > result {
+            1.0
+        } else {
+            self.error / result
+        };
+
         Self {
             index: self.index,
-            result: self.result - rhs.into(),
-            error: self.error,
+            result,
+            error: relative_error.abs(),
         }
     }
 }
@@ -179,25 +234,25 @@ impl<T> SubAssign<T> for Voxel
 where
     T: Into<f64>,
 {
-    fn sub_assign(&mut self, rhs: T) {
-        *self = *self - rhs.into();
+    fn sub_assign(&mut self, other: T) {
+        *self = *self - other.into();
     }
 }
 
 impl Mul<Self> for Voxel {
     type Output = Self;
-    fn mul(self, rhs: Self) -> Self {
+    fn mul(self, other: Self) -> Self {
         Self {
             index: self.index,
-            result: self.result * rhs.result,
-            error: (self.error.powi(2) + rhs.error.powi(2)).sqrt(),
+            result: self.result * other.result,
+            error: (self.error.powi(2) + other.error.powi(2)).sqrt(),
         }
     }
 }
 
 impl MulAssign<Self> for Voxel {
-    fn mul_assign(&mut self, rhs: Self) {
-        *self = *self * rhs;
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
     }
 }
 
@@ -206,10 +261,10 @@ where
     T: Into<f64>,
 {
     type Output = Self;
-    fn mul(self, rhs: T) -> Self {
+    fn mul(self, other: T) -> Self {
         Self {
             index: self.index,
-            result: self.result * rhs.into(),
+            result: self.result * other.into(),
             error: self.error,
         }
     }
@@ -219,25 +274,36 @@ impl<T> MulAssign<T> for Voxel
 where
     T: Into<f64>,
 {
-    fn mul_assign(&mut self, rhs: T) {
-        *self = *self * rhs.into();
+    fn mul_assign(&mut self, other: T) {
+        *self = *self * other.into();
     }
 }
 
 impl Div<Self> for Voxel {
     type Output = Self;
-    fn div(self, rhs: Self) -> Self {
+    fn div(self, other: Self) -> Self {
+        // for now retun something that looks invalid by MCNP standards when
+        // dividing by zero
+        let (result, error) = if other.result == 0.0 {
+            (0.0, 1.0)
+        } else {
+            (
+                self.result / other.result,
+                (self.error.powi(2) + other.error.powi(2)).sqrt(),
+            )
+        };
+
         Self {
             index: self.index,
-            result: self.result / rhs.result,
-            error: (self.error.powi(2) + rhs.error.powi(2)).sqrt(),
+            result,
+            error,
         }
     }
 }
 
 impl DivAssign<Self> for Voxel {
-    fn div_assign(&mut self, rhs: Self) {
-        *self = *self / rhs;
+    fn div_assign(&mut self, other: Self) {
+        *self = *self / other;
     }
 }
 
@@ -246,10 +312,10 @@ where
     T: Into<f64>,
 {
     type Output = Self;
-    fn div(self, rhs: T) -> Self {
+    fn div(self, other: T) -> Self {
         Self {
             index: self.index,
-            result: self.result / rhs.into(),
+            result: self.result / other.into(),
             error: self.error,
         }
     }
@@ -259,8 +325,8 @@ impl<T> DivAssign<T> for Voxel
 where
     T: Into<f64>,
 {
-    fn div_assign(&mut self, rhs: T) {
-        *self = *self / rhs.into();
+    fn div_assign(&mut self, other: T) {
+        *self = *self / other.into();
     }
 }
 

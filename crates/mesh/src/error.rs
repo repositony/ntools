@@ -8,6 +8,7 @@ use crate::point::Point;
 /// Type alias for Result<T, mesh::Error>
 pub(crate) type Result<T> = core::result::Result<T, Error>;
 
+/// The error type for `ntools-mesh`
 #[derive(Debug, From)]
 pub enum Error {
     /// Errors from std::io
