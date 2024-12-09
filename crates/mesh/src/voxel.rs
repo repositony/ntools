@@ -11,8 +11,36 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 // #[doc(hidden)]
 /// Extension trait for slices of voxels
 pub trait VoxelSliceExt {
-    // todo need a version that returns the max voxel
+    /// Find the maximum [Voxel]
+    ///
+    /// For example:
+    ///
+    /// ```rust
+    /// use ntools_mesh::{Voxel, VoxelSliceExt};
+    /// let voxels = vec![
+    ///     Voxel{result: 1.0, ..Default::default()},
+    ///     Voxel{result: 2.0, ..Default::default()},
+    ///     Voxel{result: 3.0, ..Default::default()},
+    /// ];
+    ///
+    /// assert_eq!(voxels.maximum_voxel().unwrap(), &voxels[2]);
+    /// ```
     fn maximum_voxel(&self) -> Result<&Voxel>;
+
+    /// Find the minimum [Voxel]
+    ///
+    /// For example:
+    ///
+    /// ```rust
+    /// use ntools_mesh::{Voxel, VoxelSliceExt};
+    /// let voxels = vec![
+    ///     Voxel{result: 1.0, ..Default::default()},
+    ///     Voxel{result: 2.0, ..Default::default()},
+    ///     Voxel{result: 3.0, ..Default::default()},
+    /// ];
+    ///
+    /// assert_eq!(voxels.mainimum_voxel().unwrap(), &voxels[0]);
+    /// ```
     fn minimum_voxel(&self) -> Result<&Voxel>;
 
     /// Find the maximum (`value`, `error`) in a [Voxel] collection
@@ -84,12 +112,6 @@ impl<V> VoxelSliceExt for V
 where
     V: AsRef<[Voxel]>,
 {
-    /// Find the maximum (`value`, `error`) in a [Voxel] collection
-    fn maximum_result_error(&self) -> Result<(f64, f64)> {
-        let voxel = self.maximum_voxel()?;
-        Ok((voxel.result, voxel.error))
-    }
-
     /// Find the maximum [Voxel]
     fn maximum_voxel(&self) -> Result<&Voxel> {
         self.as_ref()
@@ -98,9 +120,9 @@ where
             .ok_or(Error::EmptyCollection)
     }
 
-    /// Find the minimum (`value`, `error`) in a [Voxel] collection
-    fn minimum_result_error(&self) -> Result<(f64, f64)> {
-        let voxel = self.minimum_voxel()?;
+    /// Find the maximum (`value`, `error`) in a [Voxel] collection
+    fn maximum_result_error(&self) -> Result<(f64, f64)> {
+        let voxel = self.maximum_voxel()?;
         Ok((voxel.result, voxel.error))
     }
 
@@ -110,6 +132,12 @@ where
             .iter()
             .min_by(|a, b| a.result.partial_cmp(&b.result).unwrap())
             .ok_or(Error::EmptyCollection)
+    }
+
+    /// Find the minimum (`value`, `error`) in a [Voxel] collection
+    fn minimum_result_error(&self) -> Result<(f64, f64)> {
+        let voxel = self.minimum_voxel()?;
+        Ok((voxel.result, voxel.error))
     }
 
     /// Find the average (`value`, `error`) in a [Voxel] collection
