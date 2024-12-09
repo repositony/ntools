@@ -109,7 +109,7 @@ pub use group::Group;
 pub use particle::Particle;
 
 #[doc(inline)]
-pub use voxel::{Voxel, VoxelCoordinate};
+pub use voxel::{Voxel, VoxelCoordinate, VoxelSliceExt};
 
 #[doc(inline)]
 pub use vtk::{mesh_to_vtk, write_vtk};
