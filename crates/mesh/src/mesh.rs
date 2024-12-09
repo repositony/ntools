@@ -7,7 +7,7 @@ use crate::geometry::Geometry;
 use crate::group::Group;
 use crate::particle::Particle;
 use crate::point::{BoundaryTreatment, Point, PointKind};
-use crate::voxel::{Voxel, VoxelCoordinate};
+use crate::voxel::{Voxel, VoxelCoordinate, VoxelSliceExt};
 
 // ntools modules
 use ntools_utils::{f, SliceExt, ValueExt};

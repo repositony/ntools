@@ -11,6 +11,10 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 // #[doc(hidden)]
 /// Extension trait for slices of voxels
 pub trait VoxelSliceExt {
+    // todo need a version that returns the max voxel
+    fn maximum_voxel(&self) -> Result<&Voxel>;
+    fn minimum_voxel(&self) -> Result<&Voxel>;
+
     /// Find the maximum (`value`, `error`) in a [Voxel] collection
     ///
     /// For example:
@@ -25,7 +29,7 @@ pub trait VoxelSliceExt {
     ///
     /// assert_eq!(voxels.try_max().unwrap(), (3.0, 0.0));
     /// ```
-    fn try_max(&self) -> Result<(f64, f64)>;
+    fn maximum_result_error(&self) -> Result<(f64, f64)>;
 
     /// Find the minimum (`value`, `error`) in a [Voxel] collection
     ///
@@ -41,7 +45,7 @@ pub trait VoxelSliceExt {
     ///
     /// assert_eq!(voxels.try_min().unwrap(), (1.0, 0.0));
     /// ```
-    fn try_min(&self) -> Result<(f64, f64)>;
+    fn minimum_result_error(&self) -> Result<(f64, f64)>;
 
     /// Find the average (`value`, `error`) in a [Voxel] collection
     ///
@@ -57,7 +61,7 @@ pub trait VoxelSliceExt {
     ///
     /// assert_eq!(voxels.try_average().unwrap(), (2.0, 0.18708286933869708));
     /// ```
-    fn try_average(&self) -> Result<(f64, f64)>;
+    fn average_result_error(&self) -> Result<(f64, f64)>;
 
     /// Collect (`value`, `error`) pairs from a [Voxel] collection
     ///
@@ -73,7 +77,7 @@ pub trait VoxelSliceExt {
     ///
     /// assert_eq!(voxels.xy_data(), vec![(1.0, 0.0), (2.0, 0.0), (3.0, 0.0)]);
     /// ```
-    fn xy_data(&self) -> Vec<(f64, f64)>;
+    fn collect_result_error(&self) -> Vec<(f64, f64)>;
 }
 
 impl<V> VoxelSliceExt for V
@@ -81,29 +85,35 @@ where
     V: AsRef<[Voxel]>,
 {
     /// Find the maximum (`value`, `error`) in a [Voxel] collection
-    fn try_max(&self) -> Result<(f64, f64)> {
-        let voxel = self
-            .as_ref()
+    fn maximum_result_error(&self) -> Result<(f64, f64)> {
+        let voxel = self.maximum_voxel()?;
+        Ok((voxel.result, voxel.error))
+    }
+
+    /// Find the maximum [Voxel]
+    fn maximum_voxel(&self) -> Result<&Voxel> {
+        self.as_ref()
             .iter()
             .max_by(|a, b| a.result.partial_cmp(&b.result).unwrap())
-            .ok_or(Error::EmptyCollection)?;
-
-        Ok((voxel.result, voxel.error))
+            .ok_or(Error::EmptyCollection)
     }
 
     /// Find the minimum (`value`, `error`) in a [Voxel] collection
-    fn try_min(&self) -> Result<(f64, f64)> {
-        let voxel = self
-            .as_ref()
-            .iter()
-            .min_by(|a, b| a.result.partial_cmp(&b.result).unwrap())
-            .ok_or(Error::EmptyCollection)?;
-
+    fn minimum_result_error(&self) -> Result<(f64, f64)> {
+        let voxel = self.minimum_voxel()?;
         Ok((voxel.result, voxel.error))
     }
 
+    /// Find the minimum [Voxel]
+    fn minimum_voxel(&self) -> Result<&Voxel> {
+        self.as_ref()
+            .iter()
+            .min_by(|a, b| a.result.partial_cmp(&b.result).unwrap())
+            .ok_or(Error::EmptyCollection)
+    }
+
     /// Find the average (`value`, `error`) in a [Voxel] collection
-    fn try_average(&self) -> Result<(f64, f64)> {
+    fn average_result_error(&self) -> Result<(f64, f64)> {
         if self.as_ref().is_empty() {
             Err(Error::EmptyCollection)
         } else {
@@ -124,7 +134,7 @@ where
     }
 
     /// Collect (`value`, `error`) pairs from a [Voxel] collection
-    fn xy_data(&self) -> Vec<(f64, f64)> {
+    fn collect_result_error(&self) -> Vec<(f64, f64)> {
         self.as_ref().iter().map(|v| (v.result, v.error)).collect()
     }
 }
