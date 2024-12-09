@@ -8,7 +8,6 @@ use ntools_utils::ValueExt;
 // standard library
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
-// #[doc(hidden)]
 /// Extension trait for slices of voxels
 pub trait VoxelSliceExt {
     /// Find the maximum [Voxel]
@@ -39,7 +38,7 @@ pub trait VoxelSliceExt {
     ///     Voxel{result: 3.0, ..Default::default()},
     /// ];
     ///
-    /// assert_eq!(voxels.mainimum_voxel().unwrap(), &voxels[0]);
+    /// assert_eq!(voxels.minimum_voxel().unwrap(), &voxels[0]);
     /// ```
     fn minimum_voxel(&self) -> Result<&Voxel>;
 
@@ -55,7 +54,7 @@ pub trait VoxelSliceExt {
     ///     Voxel{result: 3.0, ..Default::default()},
     /// ];
     ///
-    /// assert_eq!(voxels.try_max().unwrap(), (3.0, 0.0));
+    /// assert_eq!(voxels.maximum_result_error().unwrap(), (3.0, 0.0));
     /// ```
     fn maximum_result_error(&self) -> Result<(f64, f64)>;
 
@@ -71,7 +70,7 @@ pub trait VoxelSliceExt {
     ///     Voxel{result: 3.0, ..Default::default()},
     /// ];
     ///
-    /// assert_eq!(voxels.try_min().unwrap(), (1.0, 0.0));
+    /// assert_eq!(voxels.minimum_result_error().unwrap(), (1.0, 0.0));
     /// ```
     fn minimum_result_error(&self) -> Result<(f64, f64)>;
 
@@ -87,7 +86,7 @@ pub trait VoxelSliceExt {
     ///     Voxel{result: 3.0, error: 0.1, ..Default::default()},
     /// ];
     ///
-    /// assert_eq!(voxels.try_average().unwrap(), (2.0, 0.18708286933869708));
+    /// assert_eq!(voxels.average_result_error().unwrap(), (2.0, 0.18708286933869708));
     /// ```
     fn average_result_error(&self) -> Result<(f64, f64)>;
 
@@ -103,7 +102,7 @@ pub trait VoxelSliceExt {
     ///     Voxel{result: 3.0, ..Default::default()},
     /// ];
     ///
-    /// assert_eq!(voxels.xy_data(), vec![(1.0, 0.0), (2.0, 0.0), (3.0, 0.0)]);
+    /// assert_eq!(voxels.collect_result_error(), vec![(1.0, 0.0), (2.0, 0.0), (3.0, 0.0)]);
     /// ```
     fn collect_result_error(&self) -> Vec<(f64, f64)>;
 }
