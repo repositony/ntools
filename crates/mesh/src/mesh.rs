@@ -667,6 +667,59 @@ impl Mesh {
     }
 }
 
+// * Sorted methods
+// mesh.maximum() -> just the max voxel anywhere, allow to panic on empty
+// mesh.minimum() -> just the min voxel anywhere, allow to panic on empty
+// mesh.average() -> average of every voxel, allow to panic on empty
+// mesh.try_maximum() -> user wants to handle empty voxels
+// mesh.try_minimum() -> user wants to handle empty voxels
+// mesh.try_average() -> user wants to handle empty voxels
+
+// mesh.iter() -> iterate over full voxel sets (i*j*k voxels at a time)
+// mesh.scale() -> Multiply all voxel results by some value
+// mesh.translate() -> Translate voxels and mesh by cartesian
+
+// mesh.find_point_voxels() -> get all relevant voxels at some point
+// mesh.find_point_data() -> return xy data for a point
+// mesh.find_points_data() -> return xy data for multiple points
+
+// mesh.n_voxels() -> Returns the number of voxels
+// mesh.n_voxels_per_group() -> Number of voxels in the geometry
+// mesh.n_voxels_expected() [delete] -> should fail in parse if so
+// mesh.n_ebins() -> Returns the number of energy bins
+// mesh.n_tbins() -> Returns the number of time bins
+
+// mesh.energy_bins_lower() -> slice [0..-1]
+// mesh.energy_bins_upper() -> slice [1..]
+// mesh.time_bins_lower() -> slice [0..-1]
+// mesh.time_bins_upper() -> slice [0..]
+// mesh.energy_groups() -> vector of emesh as groups, incl. total if relevant
+// mesh.time_groups() -> vector of tmesh as groups, incl. total if relevant
+
+// mesh.cell_index_from_etijk()
+// mesh.cell_index_from_voxel_index()
+// mesh.voxel_index_from_etijk()
+// mesh.voxel_index_from_cell_index()
+// mesh.etijk_from_voxel_index()
+// mesh.etijk_from_cell_index()
+
+// mesh.energy_group_from_value
+// mesh.energy_group_from_index
+// mesh.energy_index_from_group
+// mesh.energy_index_from_value
+
+// mesh.time_group_from_value
+// mesh.time_group_from_index
+// mesh.time_index_from_group
+// mesh.time_index_from_value
+
+// mesh.voxels_by_group_value -> slice or iter?
+// mesh.voxels_by_group_index -> slice or iter?
+
+// voxel_coordinates
+
+// voxel_data [not needed in mesh], add to voxelop trait
+
 // Mesh associated functions
 //
 // i.e. called as Mesh::function()
