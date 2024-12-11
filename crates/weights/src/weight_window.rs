@@ -218,7 +218,7 @@ impl WeightWindow {
     }
 
     /// Find the (e,t,i,j,k) indicies for a given cell index
-    pub fn cell_index_to_etijk(&self, idx: usize) -> (usize, usize, usize, usize, usize) {
+    pub fn etijk_from_cell_index(&self, idx: usize) -> (usize, usize, usize, usize, usize) {
         // convenient values for readability
         let a: usize = self.nt * self.ncz * self.ncy * self.ncx;
         let b: usize = self.ncz * self.ncy * self.ncx;
@@ -236,7 +236,7 @@ impl WeightWindow {
     }
 
     /// Convert indexed bins to a voxel index
-    pub fn etijk_to_voxel_index(
+    pub fn voxel_index_from_etijk(
         &self,
         e_idx: usize,
         t_idx: usize,
@@ -255,9 +255,9 @@ impl WeightWindow {
     /// Convert from a cell index to a voxel index
     ///
     /// Generally useful for weight windows to vtk plotting orders.
-    pub fn cell_index_to_voxel_index(&self, idx: usize) -> usize {
-        let (e, t, i, j, k) = self.cell_index_to_etijk(idx);
-        self.etijk_to_voxel_index(e, t, i, j, k)
+    pub fn voxel_index_from_cell_index(&self, idx: usize) -> usize {
+        let (e, t, i, j, k) = self.etijk_from_cell_index(idx);
+        self.voxel_index_from_etijk(e, t, i, j, k)
     }
 }
 

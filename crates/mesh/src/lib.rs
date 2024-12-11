@@ -64,9 +64,9 @@
 //!
 //!     // rescale, get data, do whatever is needed
 //!     mesh.scale(1.0e+06);
-//!     println!("Maximum flux: {}", Mesh::maximum(&mesh.voxels));
-//!     println!("Minimum flux: {}", Mesh::minimum(&mesh.voxels));
-//!     println!("Average flux: {}", Mesh::average(&mesh.voxels));
+//!     println!("Maximum flux: {:?}", mesh.maximum());
+//!     println!("Minimum flux: {:?}", mesh.minimum());
+//!     println!("Average flux: {:?}", mesh.average());
 //!
 //!     // Convert to VTK with the default configuration
 //!     let vtk = mesh_to_vtk(&mesh);
@@ -109,7 +109,7 @@ pub use group::Group;
 pub use particle::Particle;
 
 #[doc(inline)]
-pub use voxel::{Voxel, VoxelCoordinate};
+pub use voxel::{Voxel, VoxelCoordinate, VoxelSliceExt};
 
 #[doc(inline)]
 pub use vtk::{mesh_to_vtk, write_vtk};

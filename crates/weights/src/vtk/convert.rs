@@ -491,7 +491,7 @@ impl WeightsToVtk {
     /// Get the correct ordering required for cell index back to voxel index
     fn get_order(ww: &WeightWindow) -> Vec<usize> {
         (0..ww.nfx * ww.nfy * ww.nfz)
-            .map(|cell_idx| ww.cell_index_to_voxel_index(cell_idx))
+            .map(|cell_idx| ww.voxel_index_from_cell_index(cell_idx))
             .collect()
     }
 

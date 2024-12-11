@@ -139,9 +139,9 @@ fn initialise_ww_from_mesh(mesh: &Mesh, total_only: bool) -> WeightWindow {
     ww.ne = ww.e.len();
 
     // only bother including time info if relevant
-    if mesh.tbins() > 1 && !total_only {
+    if mesh.n_tbins() > 1 && !total_only {
         ww.iv = 2;
-        ww.nt = mesh.tbins();
+        ww.nt = mesh.n_tbins();
         ww.t = mesh.tmesh[1..].to_vec();
     }
 
@@ -177,7 +177,7 @@ fn compute_weights(mesh: &Mesh, powers: &[f64], max_errors: &[f64], total_only: 
     for e_idx in &energy_groups {
         for t_idx in &time_groups {
             // really want slice by idx
-            let voxels = mesh.slice_voxels_by_idx(*e_idx, *t_idx).unwrap();
+            let voxels = mesh.voxels_by_group_index(*e_idx, *t_idx).unwrap();
             weights.extend(weight_from_voxels(
                 mesh,
                 voxels,
@@ -221,7 +221,7 @@ fn weight_from_voxels(mesh: &Mesh, voxels: &[Voxel], power: f64, max_error: f64)
 
         // ensure the value is reasonable (looking at you CuV)
         w = constrain_weights(w);
-        wgt.push((mesh.voxel_index_to_cell_index(i), w));
+        wgt.push((mesh.cell_index_from_voxel_index(i), w));
     }
 
     wgt.sort_by(|a, b| a.0.cmp(&b.0));
@@ -328,8 +328,8 @@ fn qps_tuples(mesh_bounds: &[f64]) -> Vec<[f64; 3]> {
 /// Either just returns the `Total` for total-only selections, or will every
 /// valued group if there are multiple.
 fn relevant_groups_idx(mesh: &Mesh, total_only: bool) -> (Vec<usize>, Vec<usize>) {
-    let ebins = mesh.ebins();
-    let tbins = mesh.tbins();
+    let ebins = mesh.n_ebins();
+    let tbins = mesh.n_tbins();
 
     match total_only {
         true => (vec![ebins - 1], vec![tbins - 1]),

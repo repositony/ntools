@@ -70,8 +70,8 @@ use vtkio::xml::Compressor;
 /// # let mesh = Mesh::default();
 /// // Find the group index of a 20 MeV particle and index of the "total" group
 /// let e_idx = vec![
-///     mesh.find_energy_group_index(Group::Value(20.0)).unwrap(),
-///     mesh.find_energy_group_index(Group::Total).unwrap()
+///     mesh.energy_index_from_group(Group::Value(20.0)).unwrap(),
+///     mesh.energy_index_from_group(Group::Total).unwrap()
 /// ];
 /// ```
 ///
@@ -191,7 +191,7 @@ impl MeshToVtk {
     fn collect_energy_group_idx(&self, mesh: &Mesh) -> Vec<usize> {
         // none defined? convert everything
         if self.energy_groups.is_empty() {
-            return (0..mesh.ebins()).collect::<Vec<usize>>();
+            return (0..mesh.n_ebins()).collect::<Vec<usize>>();
         }
 
         // filter out anything not valid, usize means < 0 inherently checked
@@ -199,7 +199,7 @@ impl MeshToVtk {
             .energy_groups
             .iter()
             .copied()
-            .filter(|e_idx| e_idx < &mesh.ebins())
+            .filter(|e_idx| e_idx < &mesh.n_ebins())
             .collect::<Vec<usize>>();
 
         // clean up the list or just default to all if none of the indicies were
@@ -210,7 +210,7 @@ impl MeshToVtk {
             indicies
         } else {
             warn!("Warning: No valid energy index provided, defaulting to all");
-            (0..mesh.ebins()).collect::<Vec<usize>>()
+            (0..mesh.n_ebins()).collect::<Vec<usize>>()
         }
     }
 
@@ -218,7 +218,7 @@ impl MeshToVtk {
     fn collect_time_group_idx(&self, mesh: &Mesh) -> Vec<usize> {
         // none defined? convert everything
         if self.time_groups.is_empty() {
-            return (0..mesh.tbins()).collect::<Vec<usize>>();
+            return (0..mesh.n_tbins()).collect::<Vec<usize>>();
         }
 
         // filter out anything not valid, usize means < 0 inherently checked
@@ -226,7 +226,7 @@ impl MeshToVtk {
             .time_groups
             .iter()
             .copied()
-            .filter(|t_idx| t_idx < &mesh.tbins())
+            .filter(|t_idx| t_idx < &mesh.n_tbins())
             .collect::<Vec<usize>>();
 
         // clean up the list or just default to all if none of the indicies were
@@ -237,7 +237,7 @@ impl MeshToVtk {
             indicies
         } else {
             warn!("Warning: No valid time index provided, defaulting to all");
-            (0..mesh.tbins()).collect::<Vec<usize>>()
+            (0..mesh.n_tbins()).collect::<Vec<usize>>()
         }
     }
 
@@ -255,7 +255,7 @@ impl MeshToVtk {
         let time_prefix = match mesh.time_groups()[t_idx] {
             Group::Value(t) => f!(", Time[{t_idx}] {t:.2E} shakes"),
             Group::Total => {
-                if mesh.tbins() > 1 {
+                if mesh.n_tbins() > 1 {
                     f!(", Time[{t_idx}] Total")
                 } else {
                     "".to_string()
@@ -273,7 +273,7 @@ impl MeshToVtk {
     fn group_name_visit(&self, mesh: &Mesh, e_idx: usize, t_idx: usize) -> String {
         let energy_prefix = f!("Energy-{e_idx}");
 
-        let time_prefix = if mesh.tbins() > 1 {
+        let time_prefix = if mesh.n_tbins() > 1 {
             f!("_Time-{t_idx}")
         } else {
             "".to_string()
@@ -328,7 +328,7 @@ impl MeshToVtk {
 
         for e_idx in &energy_groups {
             for t_idx in &time_groups {
-                let voxels = mesh.slice_voxels_by_idx(*e_idx, *t_idx).unwrap();
+                let voxels = mesh.voxels_by_group_index(*e_idx, *t_idx).unwrap();
 
                 let (results, errors): (Vec<f64>, Vec<f64>) = voxels
                     .iter()
@@ -368,7 +368,7 @@ impl MeshToVtk {
     /// Sort a list of results for the rectilinear grid cell ordering
     fn sort_by_cell_index(mesh: &Mesh, values: Vec<f64>) -> Vec<f64> {
         let idx = (0..values.len())
-            .map(|i| mesh.voxel_index_to_cell_index(i))
+            .map(|i| mesh.cell_index_from_voxel_index(i))
             .collect::<Vec<usize>>();
 
         let mut result = idx.iter().zip(values.iter()).collect::<Vec<_>>();
@@ -582,7 +582,7 @@ impl MeshToVtk {
 
         for e_idx in &energy_groups {
             for t_idx in &time_groups {
-                let voxels = mesh.slice_voxels_by_idx(*e_idx, *t_idx).unwrap();
+                let voxels = mesh.voxels_by_group_index(*e_idx, *t_idx).unwrap();
 
                 let (mut results, mut errors): (Vec<f64>, Vec<f64>) = voxels
                     .iter()

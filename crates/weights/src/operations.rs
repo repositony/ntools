@@ -221,21 +221,3 @@ pub(crate) fn track_newlines(count: &mut u8, target: u8) -> &str {
         ""
     }
 }
-
-// /// Find the maximum value of a `Vec<f64>`
-// ///
-// /// Rust only havs a built-in max method for types that implement Ord. However,
-// /// floating-point types do not implement Ord because of NaN, so this is the
-// /// workaround.
-// pub fn vec_f64_max(vector: &[f64]) -> &f64 {
-//     vector.iter().max_by(|a, b| a.total_cmp(b)).unwrap()
-// }
-
-// /// Find the minimum value of a `Vec<f64>`
-// ///
-// /// Rust only havs a built-in max method for types that implement Ord. However,
-// /// floating-point types do not implement Ord because of NaN, so this is the
-// /// workaround.
-// pub fn vec_f64_min(vector: &[f64]) -> &f64 {
-//     vector.iter().min_by(|a, b| a.total_cmp(b)).unwrap()
-// }

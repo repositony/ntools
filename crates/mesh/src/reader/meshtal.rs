@@ -727,7 +727,7 @@ impl MeshtalReader {
         let e_idx = tracked.erg - 1;
         let t_idx = tracked.time - 1;
 
-        mesh.etijk_to_voxel_index(e_idx, t_idx, i_idx, j_idx, k_idx)
+        mesh.voxel_index_from_etijk(e_idx, t_idx, i_idx, j_idx, k_idx)
     }
 
     /// Groups are either energy or time, so deal with them as appropriate
@@ -943,7 +943,7 @@ impl MeshtalReader {
                 .mcpv
                 .iter()
                 .enumerate()
-                .map(|(i, _)| self.mcpv[mesh.voxel_index_to_cell_index(i)])
+                .map(|(i, _)| self.mcpv[mesh.cell_index_from_voxel_index(i)])
                 .collect();
         }
         Ok(())
@@ -951,7 +951,7 @@ impl MeshtalReader {
 
     /// Find the volume of a voxel for appropriate scaling of flux data
     fn total_voxel_volume(mesh: &Mesh, index: usize) -> f64 {
-        let (_, _, i, j, k) = mesh.voxel_index_to_etijk(index);
+        let (_, _, i, j, k) = mesh.etijk_from_voxel_index(index);
 
         // find the expected volume [cm2]
         match mesh.geometry {
@@ -984,7 +984,7 @@ impl MeshtalReader {
         // detect if reached the end, where you only add the remaining voxels
         distance.unwrap_or({
             let mut base_addon = vector.len() - skip_value;
-            let max_voxels = mesh.ebins() * mesh.tbins() * mesh.iints * mesh.jints * mesh.kints;
+            let max_voxels = mesh.n_ebins() * mesh.n_tbins() * mesh.iints * mesh.jints * mesh.kints;
             // add any zeros from the next set if not at the end of the mesh
             if mesh.voxels.len() + base_addon != max_voxels {
                 base_addon += vector.iter().position(|&x| x > 0).unwrap();
